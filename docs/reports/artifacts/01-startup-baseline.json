@@ -1,0 +1,9 @@
+{
+  "context": "debug binary; spawn to modern server/discover response; empty temporary root; sequential cold process starts",
+  "host": "macOS 27.0 arm64",
+  "max": 270.550041,
+  "p50": 4.393291,
+  "p95": 4.875125,
+  "sample_count": 30,
+  "unit": "milliseconds"
+}

@@ -1,0 +1,16 @@
+/target/
+/fuzz/target/
+/fuzz/artifacts/
+/spikes/**/target/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.db
+*.db-shm
+*.db-wal
+.env
+.env.*
+.DS_Store
+/docs/reports/private/
+__pycache__/
+# Keep Cargo.lock under version control for this binary workspace.

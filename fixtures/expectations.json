@@ -1,0 +1,361 @@
+{
+  "schema_version": 1,
+  "kind": "hand-authored-seed-expectations",
+  "warning": "Phase 03 executes these hand-authored declaration anchors against original fixture bytes. They are parser-kernel coverage, not complete language extraction or semantic resolution.",
+  "fixtures": [
+    {
+      "id": "rust-main.rs",
+      "file": "fixtures/rust/main.rs",
+      "language": "rust",
+      "required_declaration_names": [
+        "Invoice",
+        "total",
+        "summarize",
+        "label"
+      ],
+      "forbidden_declaration_names": [
+        "phantom_call"
+      ],
+      "expected_parse": "complete",
+      "execution_status": "PARSER_KERNEL_PASS"
+    },
+    {
+      "id": "rust-math.rs",
+      "file": "fixtures/rust/math.rs",
+      "language": "rust",
+      "required_declaration_names": [
+        "double",
+        "shadow"
+      ],
+      "forbidden_declaration_names": [
+        "phantom_call"
+      ],
+      "expected_parse": "complete",
+      "execution_status": "PARSER_KERNEL_PASS"
+    },
+    {
+      "id": "go-invoice.go",
+      "file": "fixtures/go/invoice.go",
+      "language": "go",
+      "required_declaration_names": [
+        "Invoice",
+        "Total",
+        "Summarize",
+        "Repository",
+        "Persist"
+      ],
+      "forbidden_declaration_names": [
+        "phantom_call"
+      ],
+      "expected_parse": "complete",
+      "execution_status": "PARSER_KERNEL_PASS"
+    },
+    {
+      "id": "go-math.go",
+      "file": "fixtures/go/math.go",
+      "language": "go",
+      "required_declaration_names": [
+        "double",
+        "Shadow",
+        "Identity"
+      ],
+      "forbidden_declaration_names": [
+        "phantom_call"
+      ],
+      "expected_parse": "complete",
+      "execution_status": "PARSER_KERNEL_PASS"
+    },
+    {
+      "id": "javascript-math.js",
+      "file": "fixtures/javascript/math.js",
+      "language": "javascript",
+      "required_declaration_names": [
+        "double",
+        "currency"
+      ],
+      "forbidden_declaration_names": [
+        "phantom_call"
+      ],
+      "expected_parse": "complete",
+      "execution_status": "PARSER_KERNEL_PASS"
+    },
+    {
+      "id": "javascript-invoice.js",
+      "file": "fixtures/javascript/invoice.js",
+      "language": "javascript",
+      "required_declaration_names": [
+        "Invoice",
+        "total",
+        "shadow",
+        "load",
+        "text"
+      ],
+      "forbidden_declaration_names": [
+        "phantom_call"
+      ],
+      "expected_parse": "complete",
+      "execution_status": "PARSER_KERNEL_PASS"
+    },
+    {
+      "id": "javascript-InvoiceCard.jsx",
+      "file": "fixtures/javascript/InvoiceCard.jsx",
+      "language": "jsx",
+      "required_declaration_names": [
+        "InvoiceCard"
+      ],
+      "forbidden_declaration_names": [
+        "phantom_call"
+      ],
+      "expected_parse": "complete",
+      "execution_status": "PARSER_KERNEL_PASS"
+    },
+    {
+      "id": "javascript-legacy.cjs",
+      "file": "fixtures/javascript/legacy.cjs",
+      "language": "javascript",
+      "required_declaration_names": [
+        "legacyTotal"
+      ],
+      "forbidden_declaration_names": [
+        "phantom_call"
+      ],
+      "expected_parse": "complete",
+      "execution_status": "PARSER_KERNEL_PASS"
+    },
+    {
+      "id": "javascript-module.mjs",
+      "file": "fixtures/javascript/module.mjs",
+      "language": "javascript",
+      "required_declaration_names": [
+        "triple"
+      ],
+      "forbidden_declaration_names": [
+        "phantom_call"
+      ],
+      "expected_parse": "complete",
+      "execution_status": "PARSER_KERNEL_PASS"
+    },
+    {
+      "id": "typescript-models.ts",
+      "file": "fixtures/typescript/models.ts",
+      "language": "typescript",
+      "required_declaration_names": [
+        "Invoice",
+        "InvoiceId",
+        "total",
+        "shadow"
+      ],
+      "forbidden_declaration_names": [
+        "phantom_call"
+      ],
+      "expected_parse": "complete",
+      "execution_status": "PARSER_KERNEL_PASS"
+    },
+    {
+      "id": "typescript-InvoiceCard.tsx",
+      "file": "fixtures/typescript/InvoiceCard.tsx",
+      "language": "tsx",
+      "required_declaration_names": [
+        "Props",
+        "InvoiceCard"
+      ],
+      "forbidden_declaration_names": [
+        "phantom_call"
+      ],
+      "expected_parse": "complete",
+      "execution_status": "PARSER_KERNEL_PASS"
+    },
+    {
+      "id": "csharp-Invoice.cs",
+      "file": "fixtures/csharp/Invoice.cs",
+      "language": "csharp",
+      "required_declaration_names": [
+        "Invoice",
+        "Amount",
+        "Total",
+        "Calculator",
+        "Double",
+        "IRepository",
+        "Save"
+      ],
+      "forbidden_declaration_names": [
+        "phantom_call"
+      ],
+      "expected_parse": "complete",
+      "execution_status": "PARSER_KERNEL_PASS"
+    },
+    {
+      "id": "csharp-Invoice.Metadata.cs",
+      "file": "fixtures/csharp/Invoice.Metadata.cs",
+      "language": "csharp",
+      "required_declaration_names": [
+        "Invoice",
+        "Customer",
+        "InvoiceSummary"
+      ],
+      "forbidden_declaration_names": [
+        "phantom_call"
+      ],
+      "expected_parse": "complete",
+      "execution_status": "PARSER_KERNEL_PASS"
+    },
+    {
+      "id": "csharp-Workflow.cs",
+      "file": "fixtures/csharp/Workflow.cs",
+      "language": "csharp",
+      "required_declaration_names": [
+        "Workflow",
+        "Persist"
+      ],
+      "forbidden_declaration_names": [
+        "phantom_call"
+      ],
+      "expected_parse": "complete",
+      "execution_status": "PARSER_KERNEL_PASS"
+    },
+    {
+      "id": "java-Invoice.java",
+      "file": "fixtures/java/Invoice.java",
+      "language": "java",
+      "required_declaration_names": [
+        "Invoice",
+        "amount",
+        "total"
+      ],
+      "forbidden_declaration_names": [
+        "phantom_call"
+      ],
+      "expected_parse": "complete",
+      "execution_status": "PARSER_KERNEL_PASS"
+    },
+    {
+      "id": "java-Calculator.java",
+      "file": "fixtures/java/Calculator.java",
+      "language": "java",
+      "required_declaration_names": [
+        "Calculator",
+        "twice"
+      ],
+      "forbidden_declaration_names": [
+        "phantom_call"
+      ],
+      "expected_parse": "complete",
+      "execution_status": "PARSER_KERNEL_PASS"
+    },
+    {
+      "id": "java-InvoiceSummary.java",
+      "file": "fixtures/java/InvoiceSummary.java",
+      "language": "java",
+      "required_declaration_names": [
+        "InvoiceSummary"
+      ],
+      "forbidden_declaration_names": [
+        "phantom_call"
+      ],
+      "expected_parse": "complete",
+      "execution_status": "PARSER_KERNEL_PASS"
+    },
+    {
+      "id": "dart-invoice.dart",
+      "file": "fixtures/dart/invoice.dart",
+      "language": "dart",
+      "required_declaration_names": [
+        "Invoice",
+        "total",
+        "label",
+        "InvoiceLabel",
+        "display"
+      ],
+      "forbidden_declaration_names": [
+        "phantom_call"
+      ],
+      "expected_parse": "complete",
+      "execution_status": "PARSER_KERNEL_PASS"
+    },
+    {
+      "id": "dart-math.dart",
+      "file": "fixtures/dart/math.dart",
+      "language": "dart",
+      "required_declaration_names": [
+        "twice",
+        "shadow"
+      ],
+      "forbidden_declaration_names": [
+        "phantom_call"
+      ],
+      "expected_parse": "complete",
+      "execution_status": "PARSER_KERNEL_PASS"
+    },
+    {
+      "id": "dart-invoice_card.dart",
+      "file": "fixtures/dart/invoice_card.dart",
+      "language": "dart",
+      "required_declaration_names": [
+        "InvoiceCard",
+        "invoice",
+        "build"
+      ],
+      "forbidden_declaration_names": [
+        "phantom_call"
+      ],
+      "expected_parse": "complete",
+      "execution_status": "PARSER_KERNEL_PASS"
+    },
+    {
+      "id": "dart-modern.dart",
+      "file": "fixtures/dart/modern.dart",
+      "language": "dart",
+      "required_declaration_names": [
+        "Outcome",
+        "Success",
+        "InvoiceId",
+        "summary",
+        "currencyOf"
+      ],
+      "forbidden_declaration_names": [
+        "phantom_call"
+      ],
+      "expected_parse": "capability_probe",
+      "execution_status": "PARSER_KERNEL_PASS"
+    },
+    {
+      "id": "partial-broken.ts",
+      "file": "fixtures/partial/broken.ts",
+      "language": "typescript",
+      "required_declaration_names": [
+        "complete"
+      ],
+      "forbidden_declaration_names": [
+        "phantom_call"
+      ],
+      "expected_parse": "partial_with_diagnostic",
+      "execution_status": "PARSER_KERNEL_PASS"
+    },
+    {
+      "id": "unicode-unicode.ts",
+      "file": "fixtures/unicode/unicode.ts",
+      "language": "typescript",
+      "required_declaration_names": [
+        "selam"
+      ],
+      "forbidden_declaration_names": [
+        "phantom_call"
+      ],
+      "expected_parse": "complete",
+      "execution_status": "PARSER_KERNEL_PASS"
+    },
+    {
+      "id": "unicode-crlf.ts",
+      "file": "fixtures/unicode/crlf.ts",
+      "language": "typescript",
+      "required_declaration_names": [
+        "sum"
+      ],
+      "forbidden_declaration_names": [
+        "phantom_call"
+      ],
+      "expected_parse": "complete",
+      "execution_status": "PARSER_KERNEL_PASS"
+    }
+  ]
+}

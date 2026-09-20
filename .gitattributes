@@ -1,0 +1,4 @@
+* text=auto
+fixtures/** -text
+spikes/compatibility/fixtures/** -text
+fixtures/unicode/crlf.ts -text

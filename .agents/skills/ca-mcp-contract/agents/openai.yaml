@@ -1,0 +1,6 @@
+interface:
+  display_name: "MCP Contracts"
+  short_description: "CodeAtlas: mcp contracts"
+  default_prompt: "Use $ca-mcp-contract to carry out the requested CodeAtlas phase within its acceptance gates."
+policy:
+  allow_implicit_invocation: true

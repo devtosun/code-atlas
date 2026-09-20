@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "kind": "hand-reviewed-project-source-declaration-corpus",
+  "authorization": "project-owned-source-authorized-for-local-evaluation",
+  "provenance": "CodeAtlas source files in this repository; evaluated locally and never uploaded",
+  "reviewed_on": "2026-09-20",
+  "files": [
+    {
+      "file": "crates/ca-engine/src/lib.rs",
+      "language": "rust",
+      "sha256": "8488de52e45971d8079f25ba353e96f9072406859b44f868511cb92c0c19ebab"
+    },
+    {
+      "file": "crates/ca-languages/src/lib.rs",
+      "language": "rust",
+      "sha256": "1f2c335e93d92c9cfa5b37c6541dc424fccc31406cf65f00df95929921ece96f"
+    },
+    {
+      "file": "crates/ca-storage/src/lib.rs",
+      "language": "rust",
+      "sha256": "dc73a176cd7687199dfcf94362d02f2b7c070a1cb807e3e37ae8a9f13146e4c7"
+    },
+    {
+      "file": "crates/ca-cli/build.rs",
+      "language": "rust",
+      "sha256": "663d577ce1bf46e9ecf06a86c9e3813a0c5001dd2c49146d02542e14c4ed717c"
+    },
+    {
+      "file": "crates/ca-cli/tests/workspace.rs",
+      "language": "rust",
+      "sha256": "0b4479f9200c19a556625b7ba8d5be03422c222c4a265ef9e8db2f3340dbc10e"
+    }
+  ]
+}

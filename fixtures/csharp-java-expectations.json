@@ -1,0 +1,233 @@
+{
+  "schema_version": 1,
+  "fixtures": [
+    {
+      "id": "csharp-invoice",
+      "file": "fixtures/csharp/Invoice.cs",
+      "language": "csharp",
+      "expected_parse": "complete",
+      "required_declarations": [
+        {"kind":"namespace","name":"Billing","container":null,"attribute":null,"limitation":null,"signature_contains":null},
+        {"kind":"class","name":"Invoice","container":"Billing","attribute":"partial_declaration","limitation":"partial_group_not_semantically_confirmed","signature_contains":null},
+        {"kind":"property","name":"Amount","container":"Invoice","attribute":null,"limitation":null,"signature_contains":null},
+        {"kind":"method","name":"Total","container":"Invoice","attribute":"overload_identity_preserved","limitation":null,"signature_contains":"Total()"},
+        {"kind":"method","name":"Total","container":"Invoice","attribute":"overload_identity_preserved","limitation":null,"signature_contains":"Total(decimal discount)"},
+        {"kind":"interface","name":"IRepository","container":"Billing","attribute":null,"limitation":null,"signature_contains":null},
+        {"kind":"method","name":"Save","container":"IRepository","attribute":"interface_member_syntax","limitation":"implementation_not_inferred","signature_contains":null}
+      ],
+      "required_imports": [],
+      "required_calls": [
+        {"kind":"method","name":"Double","receiver_expression":"Calculator","attribute":"receiver_expression_source","limitation":"interface_virtual_or_extension_dispatch_not_resolved"},
+        {"kind":"function","name":"Total","receiver_expression":null,"attribute":null,"limitation":"call_target_not_resolved"}
+      ],
+      "required_references": [],
+      "required_conditions": [],
+      "forbidden_observations": ["phantom_call"]
+    },
+    {
+      "id": "csharp-invoice-metadata",
+      "file": "fixtures/csharp/Invoice.Metadata.cs",
+      "language": "csharp",
+      "expected_parse": "complete",
+      "required_declarations": [
+        {"kind":"class","name":"Invoice","container":"Billing","attribute":"partial_group_hint:Billing.Invoice","limitation":"partial_group_not_semantically_confirmed","signature_contains":null},
+        {"kind":"property","name":"Customer","container":"Invoice","attribute":null,"limitation":null,"signature_contains":null},
+        {"kind":"record","name":"InvoiceSummary","container":"Billing","attribute":null,"limitation":null,"signature_contains":null}
+      ],
+      "required_imports": [],
+      "required_calls": [],
+      "required_references": [],
+      "required_conditions": [],
+      "forbidden_observations": []
+    },
+    {
+      "id": "csharp-workflow",
+      "file": "fixtures/csharp/Workflow.cs",
+      "language": "csharp",
+      "expected_parse": "complete",
+      "required_declarations": [
+        {"kind":"class","name":"Workflow","container":"Billing","attribute":null,"limitation":null,"signature_contains":null},
+        {"kind":"method","name":"Persist","container":"Workflow","attribute":null,"limitation":null,"signature_contains":"Persist(IRepository repository, Invoice invoice)"}
+      ],
+      "required_imports": [],
+      "required_calls": [
+        {"kind":"method","name":"Save","receiver_expression":"repository","attribute":"receiver_expression_source","limitation":"interface_virtual_or_extension_dispatch_not_resolved"}
+      ],
+      "required_references": [],
+      "required_conditions": [],
+      "forbidden_observations": []
+    },
+    {
+      "id": "csharp-advanced",
+      "file": "fixtures/csharp/Advanced.cs",
+      "language": "csharp",
+      "expected_parse": "complete",
+      "required_declarations": [
+        {"kind":"namespace","name":"Billing.Domain","container":null,"attribute":null,"limitation":null,"signature_contains":null},
+        {"kind":"enum","name":"InvoiceState","container":"Billing.Domain","attribute":null,"limitation":null,"signature_contains":null},
+        {"kind":"class","name":"Ledger","container":"Billing.Domain","attribute":"partial_declaration","limitation":"partial_group_not_semantically_confirmed","signature_contains":null},
+        {"kind":"class","name":"Ledger","container":"Billing.Domain","attribute":"attribute:Audit","limitation":null,"signature_contains":null},
+        {"kind":"constructor","name":"Ledger","container":"Ledger","attribute":null,"limitation":null,"signature_contains":"Ledger(IRepository repository)"},
+        {"kind":"method","name":"Echo","container":"Ledger","attribute":"overload_identity_preserved","limitation":null,"signature_contains":"Echo(T value)"},
+        {"kind":"method","name":"Echo","container":"Ledger","attribute":"overload_identity_preserved","limitation":null,"signature_contains":"Echo(T value, int count)"},
+        {"kind":"method","name":"LoadAsync","container":"Ledger","attribute":"async","limitation":null,"signature_contains":"LoadAsync(T value)"},
+        {"kind":"local_function","name":"Normalize","container":"LoadAsync","attribute":null,"limitation":null,"signature_contains":"Normalize(T item)"},
+        {"kind":"class","name":"Nested","container":"Ledger","attribute":null,"limitation":null,"signature_contains":null},
+        {"kind":"method","name":"WithTax","container":"InvoiceExtensions","attribute":"extension_method_syntax","limitation":"extension_dispatch_not_resolved","signature_contains":"this Invoice invoice"}
+      ],
+      "required_imports": [
+        {"kind":"using","path":"System","alias":null,"attribute":null},
+        {"kind":"using","path":"System.String","alias":"Text","attribute":null}
+      ],
+      "required_calls": [
+        {"kind":"method","name":"Save","receiver_expression":"target","attribute":"receiver_expression_source","limitation":"interface_virtual_or_extension_dispatch_not_resolved"},
+        {"kind":"method","name":"Yield","receiver_expression":"System.Threading.Tasks.Task","attribute":"awaited","limitation":"receiver_type_not_inferred"},
+        {"kind":"method","name":"Total","receiver_expression":"invoice","attribute":"receiver_expression_source","limitation":"interface_virtual_or_extension_dispatch_not_resolved"}
+      ],
+      "required_references": [
+        {"kind":"attribute","name":"Audit","receiver_expression":null,"attribute":"role:attribute","limitation":"attribute_behavior_and_arguments_not_evaluated"}
+      ],
+      "required_conditions": ["DEBUG"],
+      "forbidden_observations": []
+    },
+    {
+      "id": "csharp-top-level",
+      "file": "fixtures/csharp/TopLevel.cs",
+      "language": "csharp",
+      "expected_parse": "complete",
+      "required_declarations": [
+        {"kind":"local","name":"invoice","container":null,"attribute":null,"limitation":null,"signature_contains":null},
+        {"kind":"local","name":"total","container":null,"attribute":null,"limitation":null,"signature_contains":null}
+      ],
+      "required_imports": [
+        {"kind":"using","path":"Billing","alias":null,"attribute":null}
+      ],
+      "required_calls": [
+        {"kind":"constructor","name":"Invoice","receiver_expression":null,"attribute":null,"limitation":"constructor_target_not_resolved"},
+        {"kind":"method","name":"WithTax","receiver_expression":"invoice","attribute":"receiver_expression_source","limitation":"interface_virtual_or_extension_dispatch_not_resolved"},
+        {"kind":"method","name":"WriteLine","receiver_expression":"Console","attribute":"receiver_expression_source","limitation":"interface_virtual_or_extension_dispatch_not_resolved"}
+      ],
+      "required_references": [],
+      "required_conditions": [],
+      "forbidden_observations": ["phantom_call", "Phantom", "IRepository.Save"]
+    },
+    {
+      "id": "csharp-malformed",
+      "file": "fixtures/csharp/Broken.cs",
+      "language": "csharp",
+      "expected_parse": "partial_with_diagnostic",
+      "required_declarations": [
+        {"kind":"method","name":"Complete","container":"Billing","attribute":null,"limitation":null,"signature_contains":"Complete()"}
+      ],
+      "required_imports": [],
+      "required_calls": [],
+      "required_references": [],
+      "required_conditions": [],
+      "forbidden_observations": []
+    },
+    {
+      "id": "csharp-unicode-crlf",
+      "file": "fixtures/csharp/Unicode.cs",
+      "language": "csharp",
+      "expected_parse": "complete",
+      "required_declarations": [
+        {"kind":"class","name":"Müşteri","container":"Billing","attribute":null,"limitation":null,"signature_contains":null},
+        {"kind":"property","name":"İsim","container":"Müşteri","attribute":null,"limitation":null,"signature_contains":null}
+      ],
+      "required_imports": [],
+      "required_calls": [],
+      "required_references": [],
+      "required_conditions": [],
+      "forbidden_observations": []
+    },
+    {
+      "id": "java-invoice",
+      "file": "fixtures/java/Invoice.java",
+      "language": "java",
+      "expected_parse": "complete",
+      "required_declarations": [
+        {"kind":"class","name":"Invoice","container":null,"attribute":null,"limitation":null,"signature_contains":null},
+        {"kind":"field","name":"amount","container":"Invoice","attribute":null,"limitation":null,"signature_contains":null},
+        {"kind":"constructor","name":"Invoice","container":"Invoice","attribute":null,"limitation":null,"signature_contains":"Invoice(long amount)"},
+        {"kind":"method","name":"total","container":"Invoice","attribute":"overload_identity_preserved","limitation":null,"signature_contains":"total()"},
+        {"kind":"method","name":"total","container":"Invoice","attribute":"overload_identity_preserved","limitation":null,"signature_contains":"total(long discount)"}
+      ],
+      "required_imports": [
+        {"kind":"package","path":"billing","alias":null,"attribute":null}
+      ],
+      "required_calls": [
+        {"kind":"method","name":"twice","receiver_expression":"Calculator","attribute":"receiver_expression_source","limitation":"interface_or_virtual_dispatch_not_resolved"},
+        {"kind":"method","name":"total","receiver_expression":null,"attribute":null,"limitation":"call_target_not_resolved"}
+      ],
+      "required_references": [],
+      "required_conditions": [],
+      "forbidden_observations": ["phantom_call"]
+    },
+    {
+      "id": "java-advanced",
+      "file": "fixtures/java/Advanced.java",
+      "language": "java",
+      "expected_parse": "complete",
+      "required_declarations": [
+        {"kind":"annotation_type","name":"Audited","container":null,"attribute":null,"limitation":null,"signature_contains":null},
+        {"kind":"interface","name":"Repository","container":null,"attribute":"generic_syntax","limitation":null,"signature_contains":null},
+        {"kind":"method","name":"save","container":"Repository","attribute":"interface_member_syntax","limitation":"implementation_not_inferred","signature_contains":null},
+        {"kind":"enum","name":"InvoiceState","container":null,"attribute":null,"limitation":null,"signature_contains":null},
+        {"kind":"record","name":"Entry","container":null,"attribute":"generic_syntax","limitation":null,"signature_contains":null},
+        {"kind":"class","name":"Workflow","container":null,"attribute":"annotation:Audited","limitation":null,"signature_contains":null},
+        {"kind":"constructor","name":"Workflow","container":"Workflow","attribute":null,"limitation":null,"signature_contains":"Workflow(Repository<T> repository)"},
+        {"kind":"method","name":"map","container":"Workflow","attribute":"generic_syntax","limitation":null,"signature_contains":"map(T value, Function<T, R> mapper)"},
+        {"kind":"method","name":"map","container":"Workflow","attribute":"generic_syntax","limitation":null,"signature_contains":"map(T value, R fallback"},
+        {"kind":"class","name":"Nested","container":"Workflow","attribute":"nested_type","limitation":null,"signature_contains":null}
+      ],
+      "required_imports": [
+        {"kind":"package","path":"billing.workflow","alias":null,"attribute":null},
+        {"kind":"import","path":"java.util.List","alias":null,"attribute":null},
+        {"kind":"import","path":"java.util.Objects.requireNonNull","alias":null,"attribute":"static_import"}
+      ],
+      "required_calls": [
+        {"kind":"method","name":"save","receiver_expression":"repository","attribute":"receiver_expression_source","limitation":"interface_or_virtual_dispatch_not_resolved"},
+        {"kind":"constructor","name":"Invoice","receiver_expression":null,"attribute":null,"limitation":"constructor_target_not_resolved"}
+      ],
+      "required_references": [
+        {"kind":"annotation","name":"Audited","receiver_expression":null,"attribute":"role:annotation","limitation":"annotation_behavior_and_arguments_not_evaluated"},
+        {"kind":"method_reference","name":"Entry::new","receiver_expression":null,"attribute":"method_reference_syntax","limitation":"method_reference_not_a_call_edge"}
+      ],
+      "required_conditions": [],
+      "forbidden_observations": []
+    },
+    {
+      "id": "java-malformed",
+      "file": "fixtures/java/Broken.java",
+      "language": "java",
+      "expected_parse": "partial_with_diagnostic",
+      "required_declarations": [
+        {"kind":"method","name":"complete","container":null,"attribute":null,"limitation":null,"signature_contains":"complete()"}
+      ],
+      "required_imports": [
+        {"kind":"package","path":"billing","alias":null,"attribute":null}
+      ],
+      "required_calls": [],
+      "required_references": [],
+      "required_conditions": [],
+      "forbidden_observations": []
+    },
+    {
+      "id": "java-unicode-crlf",
+      "file": "fixtures/java/Unicode.java",
+      "language": "java",
+      "expected_parse": "complete",
+      "required_declarations": [
+        {"kind":"class","name":"Müşteri","container":null,"attribute":null,"limitation":null,"signature_contains":null},
+        {"kind":"field","name":"isim","container":"Müşteri","attribute":null,"limitation":null,"signature_contains":null}
+      ],
+      "required_imports": [
+        {"kind":"package","path":"billing","alias":null,"attribute":null}
+      ],
+      "required_calls": [],
+      "required_references": [],
+      "required_conditions": [],
+      "forbidden_observations": []
+    }
+  ]
+}

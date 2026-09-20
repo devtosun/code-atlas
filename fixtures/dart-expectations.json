@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "fixtures": [
+    {
+      "id": "dart-invoice",
+      "file": "fixtures/dart/invoice.dart",
+      "language": "dart",
+      "expected_parse": "complete",
+      "required_declarations": [
+        {"kind":"class","name":"Invoice","container":null,"attribute":null,"limitation":null,"signature_contains":null},
+        {"kind":"constructor","name":"Invoice","container":"Invoice","attribute":"constructor_owner:Invoice","limitation":"constructor_identity_is_syntax_only","signature_contains":"Invoice(this.amount)"},
+        {"kind":"constructor","name":"zero","container":"Invoice","attribute":"named_constructor","limitation":"constructor_identity_is_syntax_only","signature_contains":"Invoice.zero()"},
+        {"kind":"factory_constructor","name":"from","container":"Invoice","attribute":"factory_constructor","limitation":"constructor_identity_is_syntax_only","signature_contains":"factory Invoice.from"},
+        {"kind":"getter","name":"total","container":"Invoice","attribute":null,"limitation":null,"signature_contains":"get total"},
+        {"kind":"method","name":"label","container":"Invoice","attribute":null,"limitation":null,"signature_contains":"label()"},
+        {"kind":"extension","name":"InvoiceLabel","container":null,"attribute":null,"limitation":null,"signature_contains":null},
+        {"kind":"method","name":"display","container":"InvoiceLabel","attribute":null,"limitation":null,"signature_contains":"display()"}
+      ],
+      "required_imports": [
+        {"kind":"import","path":"math.dart","alias":"calc","attribute":null,"limitation":"package_and_library_resolution_not_performed"}
+      ],
+      "required_calls": [
+        {"kind":"constructor_like","name":"Invoice","receiver_expression":null,"attribute":"capitalized_constructor_like_syntax","limitation":"constructor_or_function_target_not_resolved"},
+        {"kind":"method","name":"twice","receiver_expression":"calc","attribute":"receiver_expression_source","limitation":"receiver_type_or_import_prefix_not_inferred"}
+      ],
+      "required_references": [
+        {"kind":"identifier","name":"calc","receiver_expression":null,"attribute":"member_receiver_or_import_prefix_syntax","limitation":"import_prefix_vs_value_not_resolved"}
+      ],
+      "required_diagnostic_fragments": ["dart_source_only_limits"],
+      "forbidden_observations": ["phantom_call"]
+    },
+    {
+      "id": "dart-shadowing",
+      "file": "fixtures/dart/math.dart",
+      "language": "dart",
+      "expected_parse": "complete",
+      "required_declarations": [
+        {"kind":"function","name":"twice","container":null,"attribute":null,"limitation":null,"signature_contains":"twice(int value)"},
+        {"kind":"function","name":"shadow","container":null,"attribute":null,"limitation":null,"signature_contains":"Function(int) twice"},
+        {"kind":"parameter","name":"twice","container":"shadow","attribute":null,"limitation":null,"signature_contains":null}
+      ],
+      "required_imports": [],
+      "required_calls": [
+        {"kind":"function","name":"twice","receiver_expression":null,"attribute":null,"limitation":"call_target_not_resolved"}
+      ],
+      "required_references": [],
+      "required_diagnostic_fragments": [],
+      "forbidden_observations": []
+    },
+    {
+      "id": "dart-flutter-style",
+      "file": "fixtures/dart/invoice_card.dart",
+      "language": "dart",
+      "expected_parse": "complete",
+      "required_declarations": [
+        {"kind":"class","name":"InvoiceCard","container":null,"attribute":null,"limitation":null,"signature_contains":null},
+        {"kind":"constructor","name":"InvoiceCard","container":"InvoiceCard","attribute":"const_constructor","limitation":"constructor_identity_is_syntax_only","signature_contains":"super.key"},
+        {"kind":"method","name":"build","container":"InvoiceCard","attribute":"annotation:override","limitation":"annotation_behavior_not_evaluated","signature_contains":"Widget build"}
+      ],
+      "required_imports": [
+        {"kind":"import","path":"package:flutter/widgets.dart","alias":null,"attribute":"external_package_uri","limitation":"package_and_library_resolution_not_performed"},
+        {"kind":"import","path":"invoice.dart","alias":null,"attribute":null,"limitation":"package_and_library_resolution_not_performed"}
+      ],
+      "required_calls": [
+        {"kind":"constructor_like","name":"Column","receiver_expression":null,"attribute":"named_arguments_syntax","limitation":"flutter_widget_identity_and_tree_not_inferred"},
+        {"kind":"constructor_like","name":"Text","receiver_expression":null,"attribute":"capitalized_constructor_like_syntax","limitation":"constructor_or_function_target_not_resolved"},
+        {"kind":"method","name":"label","receiver_expression":"invoice","attribute":"receiver_expression_source","limitation":"dynamic_dispatch_target_not_resolved"}
+      ],
+      "required_references": [
+        {"kind":"annotation","name":"override","receiver_expression":null,"attribute":"role:annotation","limitation":"annotation_target_and_behavior_not_resolved"}
+      ],
+      "required_diagnostic_fragments": ["semantic widget tree"],
+      "forbidden_observations": []
+    },
+    {
+      "id": "dart-modern",
+      "file": "fixtures/dart/modern.dart",
+      "language": "dart",
+      "expected_parse": "complete",
+      "required_declarations": [
+        {"kind":"class","name":"Outcome","container":null,"attribute":"modifier:sealed","limitation":null,"signature_contains":null},
+        {"kind":"class","name":"Success","container":null,"attribute":"modifier:final","limitation":null,"signature_contains":null},
+        {"kind":"extension_type","name":"InvoiceId","container":null,"attribute":null,"limitation":null,"signature_contains":null},
+        {"kind":"representation_field","name":"value","container":"InvoiceId","attribute":null,"limitation":null,"signature_contains":null},
+        {"kind":"function","name":"summary","container":null,"attribute":null,"limitation":null,"signature_contains":"(int, String) summary"},
+        {"kind":"pattern_variable","name":"amount","container":"currencyOf","attribute":"pattern_binding_syntax","limitation":null,"signature_contains":null},
+        {"kind":"pattern_variable","name":"currency","container":"currencyOf","attribute":"pattern_binding_syntax","limitation":null,"signature_contains":null}
+      ],
+      "required_imports": [],
+      "required_calls": [],
+      "required_references": [],
+      "required_diagnostic_fragments": [],
+      "forbidden_observations": []
+    },
+    {
+      "id": "dart-advanced",
+      "file": "fixtures/dart/advanced.dart",
+      "language": "dart",
+      "expected_parse": "complete",
+      "required_declarations": [
+        {"kind":"mixin","name":"Audited","container":null,"attribute":null,"limitation":null,"signature_contains":null},
+        {"kind":"enum","name":"Status","container":null,"attribute":null,"limitation":null,"signature_contains":null},
+        {"kind":"type_alias","name":"Mapper","container":null,"attribute":"generic_syntax","limitation":null,"signature_contains":null},
+        {"kind":"class","name":"Event","container":null,"attribute":"modifier:sealed","limitation":null,"signature_contains":null},
+        {"kind":"redirecting_factory_constructor","name":"circle","container":"Shape","attribute":"redirecting_constructor","limitation":"redirect_target_not_resolved","signature_contains":"factory Shape.circle"},
+        {"kind":"class","name":"InvoiceEvent","container":null,"attribute":"generic_syntax","limitation":null,"signature_contains":null},
+        {"kind":"constructor","name":"named","container":"InvoiceEvent","attribute":"named_constructor","limitation":"constructor_identity_is_syntax_only","signature_contains":"InvoiceEvent.named"},
+        {"kind":"factory_constructor","name":"from","container":"InvoiceEvent","attribute":"factory_constructor","limitation":"constructor_identity_is_syntax_only","signature_contains":"factory InvoiceEvent.from"},
+        {"kind":"getter","name":"label","container":"InvoiceEvent","attribute":null,"limitation":null,"signature_contains":"get label"},
+        {"kind":"setter","name":"label","container":"InvoiceEvent","attribute":null,"limitation":null,"signature_contains":"set label"},
+        {"kind":"method","name":"load","container":"InvoiceEvent","attribute":"async","limitation":null,"signature_contains":"Future<T> load"},
+        {"kind":"local","name":"callback","container":"load","attribute":null,"limitation":null,"signature_contains":null},
+        {"kind":"parameter","name":"shadowed","container":"load","attribute":null,"limitation":null,"signature_contains":null}
+      ],
+      "required_imports": [
+        {"kind":"library","path":"billing.feature","alias":null,"attribute":null,"limitation":"library_identity_not_analyzer_resolved"},
+        {"kind":"import","path":"package:external/repository.dart","alias":"repo","attribute":"external_package_uri","limitation":"package_and_library_resolution_not_performed"},
+        {"kind":"export","path":"invoice.dart","alias":null,"attribute":null,"limitation":"export_cycle_guard_required"},
+        {"kind":"part","path":"advanced_part.dart","alias":null,"attribute":null,"limitation":"part_relationship_not_resolved"}
+      ],
+      "required_calls": [
+        {"kind":"constructor_like","name":"InvoiceEvent","receiver_expression":null,"attribute":"capitalized_constructor_like_syntax","limitation":"flutter_widget_identity_and_tree_not_inferred"},
+        {"kind":"method","name":"fetch","receiver_expression":"repository","attribute":"awaited","limitation":"dynamic_dispatch_target_not_resolved"},
+        {"kind":"function","name":"callback","receiver_expression":null,"attribute":null,"limitation":"call_target_not_resolved"}
+      ],
+      "required_references": [],
+      "required_diagnostic_fragments": ["build_runner"],
+      "forbidden_observations": ["phantom_call", "PhantomWidget"]
+    },
+    {
+      "id": "dart-part",
+      "file": "fixtures/dart/advanced_part.dart",
+      "language": "dart",
+      "expected_parse": "complete",
+      "required_declarations": [
+        {"kind":"function","name":"partLabel","container":null,"attribute":null,"limitation":null,"signature_contains":"InvoiceEvent<Object> event"}
+      ],
+      "required_imports": [
+        {"kind":"part_of","path":"billing.feature","alias":null,"attribute":null,"limitation":"part_relationship_not_resolved"}
+      ],
+      "required_calls": [],
+      "required_references": [
+        {"kind":"identifier","name":"label","receiver_expression":null,"attribute":"role:value","limitation":null}
+      ],
+      "required_diagnostic_fragments": [],
+      "forbidden_observations": []
+    },
+    {
+      "id": "dart-malformed",
+      "file": "fixtures/dart/Broken.dart",
+      "language": "dart",
+      "expected_parse": "partial_with_diagnostic",
+      "required_declarations": [
+        {"kind":"function","name":"complete","container":null,"attribute":null,"limitation":null,"signature_contains":"complete()"}
+      ],
+      "required_imports": [
+        {"kind":"import","path":"dart:async","alias":null,"attribute":"dart_sdk_uri","limitation":"package_and_library_resolution_not_performed"}
+      ],
+      "required_calls": [],
+      "required_references": [],
+      "required_diagnostic_fragments": ["syntax_error", "recovered ERROR subtrees"],
+      "forbidden_observations": []
+    },
+    {
+      "id": "dart-unicode-crlf",
+      "file": "fixtures/dart/Unicode.dart",
+      "language": "dart",
+      "expected_parse": "complete",
+      "required_declarations": [
+        {"kind":"class","name":"Customer","container":null,"attribute":null,"limitation":null,"signature_contains":null},
+        {"kind":"constructor","name":"Customer","container":"Customer","attribute":"constructor_owner:Customer","limitation":"constructor_identity_is_syntax_only","signature_contains":"Customer(this.name)"},
+        {"kind":"method","name":"summary","container":"Customer","attribute":null,"limitation":null,"signature_contains":"summary()"}
+      ],
+      "required_imports": [
+        {"kind":"import","path":"package:ornek/veri.dart","alias":"veri","attribute":"external_package_uri","limitation":"package_and_library_resolution_not_performed"}
+      ],
+      "required_calls": [
+        {"kind":"method","name":"write","receiver_expression":"veri","attribute":"receiver_expression_source","limitation":"receiver_type_or_import_prefix_not_inferred"}
+      ],
+      "required_references": [],
+      "required_diagnostic_fragments": ["does not accept non-ASCII identifiers"],
+      "forbidden_observations": ["İstanbul", "müşteri"]
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-20",
+  "host": "macOS arm64",
+  "production_toolchain": "rustc 1.98.1 (48a229cea)",
+  "isolated_fuzz_toolchain": "cargo 1.100.0-nightly (495c385d0 2026-09-16)",
+  "cargo_fuzz": "0.13.2",
+  "libfuzzer_sys": "0.4.10",
+  "build": {
+    "command": "cargo +nightly fuzz build",
+    "exit_code": 0
+  },
+  "corpus_policy": "Each run copied the one committed seed into an isolated /private/tmp corpus; repository seeds were not mutated.",
+  "runs": [
+    {
+      "target": "parser_extraction",
+      "command": "cargo +nightly fuzz run parser_extraction <isolated-corpus> -- -max_total_time=300 -timeout=10 -print_final_stats=1 -artifact_prefix=<isolated-artifacts>/",
+      "exit_code": 0,
+      "duration_seconds": 301,
+      "executed_units": 50075,
+      "average_units_per_second": 166,
+      "final_corpus_units": 716,
+      "final_corpus_bytes": 24576,
+      "new_units_added": 1233,
+      "peak_rss_mb": 422,
+      "crash_artifacts": 0,
+      "timeouts": 0
+    },
+    {
+      "target": "boundary_decoders",
+      "command": "cargo +nightly fuzz run boundary_decoders <isolated-corpus> -- -max_total_time=300 -timeout=10 -print_final_stats=1 -artifact_prefix=<isolated-artifacts>/",
+      "exit_code": 0,
+      "duration_seconds": 301,
+      "executed_units": 8004978,
+      "average_units_per_second": 26594,
+      "final_corpus_units": 157,
+      "final_corpus_bytes": 10648,
+      "new_units_added": 1297,
+      "peak_rss_mb": 614,
+      "crash_artifacts": 0,
+      "timeouts": 0
+    },
+    {
+      "target": "tool_arguments",
+      "command": "cargo +nightly fuzz run tool_arguments <isolated-corpus> -- -max_total_time=300 -timeout=10 -print_final_stats=1 -artifact_prefix=<isolated-artifacts>/",
+      "exit_code": 0,
+      "duration_seconds": 301,
+      "executed_units": 8630950,
+      "average_units_per_second": 28674,
+      "final_corpus_units": 2377,
+      "final_corpus_bytes": 70656,
+      "new_units_added": 12435,
+      "peak_rss_mb": 672,
+      "crash_artifacts": 0,
+      "timeouts": 0
+    }
+  ],
+  "limitations": [
+    "A five-minute clean run is bug-finding evidence, not a proof of memory safety or native grammar isolation.",
+    "The host symbolizer emitted external-symbolizer/atos startup warnings; execution and crash detection still completed."
+  ]
+}

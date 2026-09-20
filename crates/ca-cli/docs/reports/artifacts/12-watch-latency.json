@@ -1,0 +1,8 @@
+{
+  "backend": "polling",
+  "debounce_ms": 50,
+  "edit_sequence": "atomic-save-rename-delete-recreate-case-rename-unicode-ignore-burst",
+  "files": 10,
+  "latency_ms": 1137.715625,
+  "reconcile_interval_ms": 1000
+}

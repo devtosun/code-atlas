@@ -1,0 +1,6 @@
+interface:
+  display_name: "Release Validation"
+  short_description: "CodeAtlas: release validation"
+  default_prompt: "Use $ca-release-validation to carry out the requested CodeAtlas phase within its acceptance gates."
+policy:
+  allow_implicit_invocation: true

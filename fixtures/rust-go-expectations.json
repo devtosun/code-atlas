@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "kind": "hand-reviewed-rust-go-source-extraction",
+  "warning": "These are syntax-level expectations. Calls intentionally have no resolved target and cfg/build-tag observations do not assert an active configuration.",
+  "fixtures": [
+    {
+      "id": "rust-domain",
+      "file": "fixtures/rust/domain.rs",
+      "language": "rust",
+      "expected_parse": "complete",
+      "required_declarations": [
+        { "kind": "module", "name": "ports" },
+        { "kind": "trait", "name": "Repository", "container": "ports" },
+        { "kind": "trait_method", "name": "save", "container": "Repository", "signature_contains": "async fn save" },
+        { "kind": "struct", "name": "Invoice" },
+        { "kind": "field", "name": "value", "container": "Invoice" },
+        { "kind": "enum", "name": "Status" },
+        { "kind": "trait", "name": "Summary" },
+        { "kind": "method", "name": "total", "container": "impl<T: ToString> Invoice<T>", "signature_contains": "pub async fn total<U>" },
+        { "kind": "method", "name": "summarize", "container": "impl<T: ToString> Summary<T> for Invoice<T>" },
+        { "kind": "macro", "name": "invoice_value" },
+        { "kind": "function", "name": "execute", "signature_contains": "pub async fn execute<R" },
+        { "kind": "function", "name": "özet" },
+        { "kind": "const", "name": "NOTE" },
+        { "kind": "static", "name": "FALLBACK" }
+      ],
+      "required_imports": [
+        { "path": "std::collections::HashMap", "alias": "Map" },
+        { "path": "std::sync::Arc" },
+        { "path": "crate::ports", "alias": "self" },
+        { "path": "crate::ports::Repository", "alias": "Repo" }
+      ],
+      "required_calls": [
+        { "kind": "function", "name": "external::format" },
+        { "kind": "function", "name": "format_value" },
+        { "kind": "macro", "name": "invoice_value" },
+        { "kind": "function", "name": "repository.save" }
+      ],
+      "required_conditions": ["cfg"],
+      "forbidden_observations": ["phantom_call"]
+    },
+    {
+      "id": "rust-receivers",
+      "file": "fixtures/rust/receivers.rs",
+      "language": "rust",
+      "expected_parse": "complete",
+      "required_declarations": [
+        { "kind": "struct", "name": "First" },
+        { "kind": "struct", "name": "Second" },
+        { "kind": "method", "name": "render", "container": "impl First" },
+        { "kind": "method", "name": "render", "container": "impl Second" },
+        { "kind": "function", "name": "shadow" },
+        { "kind": "local", "name": "value" }
+      ],
+      "required_imports": [],
+      "required_calls": [],
+      "required_conditions": [],
+      "forbidden_observations": ["phantom_call"]
+    },
+    {
+      "id": "rust-parser-regression",
+      "file": "fixtures/rust/main.rs",
+      "language": "rust",
+      "expected_parse": "complete",
+      "required_declarations": [
+        { "kind": "struct", "name": "Invoice" },
+        { "kind": "method", "name": "total" },
+        { "kind": "function", "name": "summarize" }
+      ],
+      "required_imports": [
+        { "path": "math::double", "alias": "twice" }
+      ],
+      "required_calls": [
+        { "kind": "function", "name": "twice" },
+        { "kind": "function", "name": "invoice.total" }
+      ],
+      "required_conditions": [],
+      "forbidden_observations": ["phantom_call"]
+    },
+    {
+      "id": "rust-invalid-edit",
+      "file": "fixtures/rust/broken.rs",
+      "language": "rust",
+      "expected_parse": "partial_with_diagnostic",
+      "required_declarations": [
+        { "kind": "function", "name": "incomplete" }
+      ],
+      "required_imports": [],
+      "required_calls": [
+        { "kind": "function", "name": "external::consume" }
+      ],
+      "required_conditions": [],
+      "forbidden_observations": ["phantom_call"]
+    },
+    {
+      "id": "go-domain",
+      "file": "fixtures/go/domain.go",
+      "language": "go",
+      "expected_parse": "complete",
+      "required_declarations": [
+        { "kind": "type", "name": "Invoice" },
+        { "kind": "field", "name": "Amount", "container": "Invoice" },
+        { "kind": "embedded_field", "name": "io.Reader", "container": "Invoice" },
+        { "kind": "type", "name": "Store" },
+        { "kind": "interface_method", "name": "Save", "container": "Store" },
+        { "kind": "method", "name": "Total", "container": "*Invoice[T]", "receiver_type": "*Invoice[T]" },
+        { "kind": "method", "name": "Total", "container": "Report", "receiver_type": "Report" },
+        { "kind": "function", "name": "NewInvoice", "signature_contains": "func NewInvoice[T any]" },
+        { "kind": "function", "name": "Özet" },
+        { "kind": "function", "name": "Build" },
+        { "kind": "local", "name": "encode" },
+        { "kind": "const", "name": "Note" }
+      ],
+      "required_imports": [
+        { "path": "encoding/json", "alias": "json" },
+        { "path": "io", "alias": "io", "limitation": "default_alias_derived_from_import_path" },
+        { "path": "example.com/external/client", "alias": "ext" }
+      ],
+      "required_calls": [
+        { "kind": "function", "name": "json.Marshal" },
+        { "kind": "function", "name": "encode" },
+        { "kind": "function", "name": "ext.Send" },
+        { "kind": "function", "name": "NewInvoice", "attribute": "constructor_like_syntax" }
+      ],
+      "required_conditions": ["build_tag"],
+      "forbidden_observations": ["phantom_call"]
+    },
+    {
+      "id": "go-receivers",
+      "file": "fixtures/go/receivers.go",
+      "language": "go",
+      "expected_parse": "complete",
+      "required_declarations": [
+        { "kind": "type", "name": "First" },
+        { "kind": "type", "name": "Second" },
+        { "kind": "method", "name": "Render", "receiver_type": "First" },
+        { "kind": "method", "name": "Render", "receiver_type": "Second" },
+        { "kind": "function", "name": "Shadow" },
+        { "kind": "local", "name": "value" }
+      ],
+      "required_imports": [],
+      "required_calls": [],
+      "required_conditions": [],
+      "forbidden_observations": ["phantom_call"]
+    },
+    {
+      "id": "go-parser-regression",
+      "file": "fixtures/go/invoice.go",
+      "language": "go",
+      "expected_parse": "complete",
+      "required_declarations": [
+        { "kind": "type", "name": "Invoice" },
+        { "kind": "method", "name": "Total", "receiver_type": "*Invoice" },
+        { "kind": "type", "name": "Repository" },
+        { "kind": "interface_method", "name": "Save" }
+      ],
+      "required_imports": [],
+      "required_calls": [
+        { "kind": "function", "name": "double" },
+        { "kind": "function", "name": "i.Total" },
+        { "kind": "function", "name": "r.Save" }
+      ],
+      "required_conditions": [],
+      "forbidden_observations": ["phantom_call"]
+    },
+    {
+      "id": "go-invalid-edit",
+      "file": "fixtures/go/broken.go",
+      "language": "go",
+      "expected_parse": "partial_with_diagnostic",
+      "required_declarations": [
+        { "kind": "function", "name": "Incomplete" }
+      ],
+      "required_imports": [],
+      "required_calls": [
+        { "kind": "function", "name": "external.Consume" }
+      ],
+      "required_conditions": [],
+      "forbidden_observations": ["phantom_call"]
+    }
+  ]
+}

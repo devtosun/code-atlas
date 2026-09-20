@@ -1,0 +1,6 @@
+interface:
+  display_name: "Phase Driver"
+  short_description: "CodeAtlas: phase driver"
+  default_prompt: "Use $ca-phase-driver to carry out the requested CodeAtlas phase within its acceptance gates."
+policy:
+  allow_implicit_invocation: true

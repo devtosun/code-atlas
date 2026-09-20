@@ -1,0 +1,319 @@
+{
+  "kit": "codeatlas-mcp-codex-kit",
+  "schema_version": 1,
+  "phases": [
+    {
+      "id": "00",
+      "file": "prompts/00-compatibility-spike.md",
+      "title": "Feasibility, versions and compatibility",
+      "optional": false,
+      "skills": [
+        "ca-phase-driver",
+        "ca-treesitter-language",
+        "ca-mcp-contract"
+      ],
+      "references": [
+        "docs/DEPENDENCY_POLICY.md",
+        "docs/LANGUAGE_SUPPORT.md",
+        "docs/GRAMMAR_MATRIX.md",
+        "docs/SOURCES.md"
+      ],
+      "prerequisite": null
+    },
+    {
+      "id": "01",
+      "file": "prompts/01-workspace-and-lifecycle.md",
+      "title": "Rust workspace, CLI and fast MCP lifecycle",
+      "optional": false,
+      "skills": [
+        "ca-phase-driver",
+        "ca-rust-architecture",
+        "ca-mcp-contract"
+      ],
+      "references": [
+        "docs/ARCHITECTURE.md",
+        "docs/MCP_CONTRACT.md",
+        "docs/DEPENDENCY_POLICY.md"
+      ],
+      "prerequisite": "00"
+    },
+    {
+      "id": "02",
+      "file": "prompts/02-safe-repositories-and-storage.md",
+      "title": "Authorized paths, worktrees and SQLite generations",
+      "optional": false,
+      "skills": [
+        "ca-phase-driver",
+        "ca-index-storage",
+        "ca-security-review"
+      ],
+      "references": [
+        "docs/DATA_MODEL.md",
+        "docs/SECURITY_PRIVACY.md",
+        "docs/ARCHITECTURE.md"
+      ],
+      "prerequisite": "01"
+    },
+    {
+      "id": "03",
+      "file": "prompts/03-parser-kernel.md",
+      "title": "Parser registry, capture contracts and fixtures",
+      "optional": false,
+      "skills": [
+        "ca-phase-driver",
+        "ca-treesitter-language",
+        "ca-rust-architecture"
+      ],
+      "references": [
+        "docs/LANGUAGE_SUPPORT.md",
+        "docs/GRAMMAR_MATRIX.md",
+        "docs/SECURITY_PRIVACY.md",
+        "fixtures/README.md"
+      ],
+      "prerequisite": "02"
+    },
+    {
+      "id": "04",
+      "file": "prompts/04-rust-and-go.md",
+      "title": "Rust and Go language extraction",
+      "optional": false,
+      "skills": [
+        "ca-phase-driver",
+        "ca-treesitter-language",
+        "ca-graph-resolution"
+      ],
+      "references": [
+        "docs/LANGUAGE_SUPPORT.md",
+        "docs/DATA_MODEL.md",
+        "fixtures/README.md"
+      ],
+      "prerequisite": "03"
+    },
+    {
+      "id": "05",
+      "file": "prompts/05-javascript-and-typescript.md",
+      "title": "JavaScript, JSX, TypeScript and TSX extraction",
+      "optional": false,
+      "skills": [
+        "ca-phase-driver",
+        "ca-treesitter-language",
+        "ca-graph-resolution"
+      ],
+      "references": [
+        "docs/LANGUAGE_SUPPORT.md",
+        "docs/DATA_MODEL.md",
+        "fixtures/README.md"
+      ],
+      "prerequisite": "04"
+    },
+    {
+      "id": "06",
+      "file": "prompts/06-csharp-and-java.md",
+      "title": "C# and Java extraction",
+      "optional": false,
+      "skills": [
+        "ca-phase-driver",
+        "ca-treesitter-language",
+        "ca-graph-resolution"
+      ],
+      "references": [
+        "docs/LANGUAGE_SUPPORT.md",
+        "docs/DATA_MODEL.md",
+        "fixtures/README.md"
+      ],
+      "prerequisite": "05"
+    },
+    {
+      "id": "07",
+      "file": "prompts/07-dart.md",
+      "title": "Dart and Flutter-style source extraction",
+      "optional": false,
+      "skills": [
+        "ca-phase-driver",
+        "ca-treesitter-language",
+        "ca-graph-resolution"
+      ],
+      "references": [
+        "docs/LANGUAGE_SUPPORT.md",
+        "docs/GRAMMAR_MATRIX.md",
+        "docs/DEPENDENCY_POLICY.md",
+        "fixtures/README.md"
+      ],
+      "prerequisite": "06"
+    },
+    {
+      "id": "08",
+      "file": "prompts/08-index-jobs.md",
+      "title": "Persistent indexing pipeline and cancellable jobs",
+      "optional": false,
+      "skills": [
+        "ca-phase-driver",
+        "ca-index-storage",
+        "ca-rust-architecture"
+      ],
+      "references": [
+        "docs/DATA_MODEL.md",
+        "docs/MCP_CONTRACT.md",
+        "docs/SECURITY_PRIVACY.md"
+      ],
+      "prerequisite": "07"
+    },
+    {
+      "id": "09",
+      "file": "prompts/09-resolution-and-graph.md",
+      "title": "Scope/import resolution and evidence-backed graph",
+      "optional": false,
+      "skills": [
+        "ca-phase-driver",
+        "ca-graph-resolution",
+        "ca-index-storage"
+      ],
+      "references": [
+        "docs/LANGUAGE_SUPPORT.md",
+        "docs/DATA_MODEL.md",
+        "docs/TEST_MATRIX.md"
+      ],
+      "prerequisite": "08"
+    },
+    {
+      "id": "10",
+      "file": "prompts/10-retrieval-and-context.md",
+      "title": "Search, graph queries and bounded context assembly",
+      "optional": false,
+      "skills": [
+        "ca-phase-driver",
+        "ca-graph-resolution",
+        "ca-security-review"
+      ],
+      "references": [
+        "docs/MCP_CONTRACT.md",
+        "docs/DATA_MODEL.md",
+        "docs/TEST_MATRIX.md"
+      ],
+      "prerequisite": "09"
+    },
+    {
+      "id": "11",
+      "file": "prompts/11-mcp-tools.md",
+      "title": "Production MCP tool surface and end-to-end contracts",
+      "optional": false,
+      "skills": [
+        "ca-phase-driver",
+        "ca-mcp-contract",
+        "ca-security-review"
+      ],
+      "references": [
+        "docs/MCP_CONTRACT.md",
+        "docs/SECURITY_PRIVACY.md",
+        "docs/TEST_MATRIX.md"
+      ],
+      "prerequisite": "10"
+    },
+    {
+      "id": "12",
+      "file": "prompts/12-watch-and-incremental.md",
+      "title": "Watcher, incremental reconciliation and worktrees",
+      "optional": false,
+      "skills": [
+        "ca-phase-driver",
+        "ca-index-storage",
+        "ca-rust-architecture"
+      ],
+      "references": [
+        "docs/DATA_MODEL.md",
+        "docs/ARCHITECTURE.md",
+        "docs/TEST_MATRIX.md"
+      ],
+      "prerequisite": "11"
+    },
+    {
+      "id": "13",
+      "file": "prompts/13-memory-resources-prompts.md",
+      "title": "Explicit project memory, resources and prompt templates",
+      "optional": false,
+      "skills": [
+        "ca-phase-driver",
+        "ca-mcp-contract",
+        "ca-index-storage",
+        "ca-security-review"
+      ],
+      "references": [
+        "docs/MCP_CONTRACT.md",
+        "docs/DATA_MODEL.md",
+        "docs/SECURITY_PRIVACY.md"
+      ],
+      "prerequisite": "12"
+    },
+    {
+      "id": "14",
+      "file": "prompts/14-hardening-and-evaluation.md",
+      "title": "Security, crash recovery, fuzzing and measurements",
+      "optional": false,
+      "skills": [
+        "ca-phase-driver",
+        "ca-security-review",
+        "ca-release-validation"
+      ],
+      "references": [
+        "docs/TEST_MATRIX.md",
+        "docs/SECURITY_PRIVACY.md",
+        "docs/DEPENDENCY_POLICY.md"
+      ],
+      "prerequisite": "13"
+    },
+    {
+      "id": "15",
+      "file": "prompts/15-release-and-codex.md",
+      "title": "Native packaging and safe Codex integration",
+      "optional": false,
+      "skills": [
+        "ca-phase-driver",
+        "ca-release-validation",
+        "ca-mcp-contract"
+      ],
+      "references": [
+        "docs/TEST_MATRIX.md",
+        "docs/SECURITY_PRIVACY.md",
+        "config/codex.macos.example.toml",
+        "config/codex.windows.example.toml"
+      ],
+      "prerequisite": "14"
+    },
+    {
+      "id": "16",
+      "file": "prompts/16-framework-extractors.md",
+      "title": "Optional framework structure extractors",
+      "optional": true,
+      "skills": [
+        "ca-phase-driver",
+        "ca-treesitter-language",
+        "ca-graph-resolution"
+      ],
+      "references": [
+        "docs/LANGUAGE_SUPPORT.md",
+        "docs/ARCHITECTURE.md",
+        "docs/TEST_MATRIX.md"
+      ],
+      "prerequisite": "15"
+    },
+    {
+      "id": "17",
+      "file": "prompts/17-semantic-enrichment.md",
+      "title": "Optional explicitly approved LSP enrichment",
+      "optional": true,
+      "skills": [
+        "ca-phase-driver",
+        "ca-rust-architecture",
+        "ca-graph-resolution",
+        "ca-security-review"
+      ],
+      "references": [
+        "docs/ARCHITECTURE.md",
+        "docs/LANGUAGE_SUPPORT.md",
+        "docs/SECURITY_PRIVACY.md",
+        "docs/DEPENDENCY_POLICY.md"
+      ],
+      "prerequisite": "15"
+    }
+  ]
+}

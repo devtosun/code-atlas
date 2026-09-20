@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "binary_source": "target/release/codeatlas",
+  "binary_sha256": "ec90f1123317a56c3a054745c0f27b08b4240cb7c632742ceb02249640ff751e",
+  "protocol": "2026-07-28",
+  "advertised_tools": 14,
+  "runtime_network_field": false,
+  "inspection_command": "lsof -nP -a -p <server-pid> -i",
+  "lsof_exit_code": 1,
+  "network_socket_rows": [],
+  "conclusion": "pass_no_network_sockets",
+  "eof_shutdown_ms": 1.553917012643069
+}

@@ -1,0 +1,30 @@
+; Phase 06 Java declaration and lexical-scope observations.
+(program) @scope.file.node
+(class_body) @scope.class.node
+(interface_body) @scope.interface.node
+(enum_body) @scope.enum.node
+(annotation_type_body) @scope.annotation_type.node
+(block) @scope.block.node
+(constructor_body) @scope.constructor_body.node
+(method_declaration) @scope.method.node
+(constructor_declaration) @scope.constructor.node
+(compact_constructor_declaration) @scope.constructor.node
+(lambda_expression) @scope.lambda.node
+
+(annotation_type_declaration) @declaration.annotation_type.node
+(class_declaration) @declaration.class.node
+(interface_declaration) @declaration.interface.node
+(enum_declaration) @declaration.enum.node
+(record_declaration) @declaration.record.node
+(method_declaration) @declaration.method.node
+(constructor_declaration) @declaration.constructor.node
+(compact_constructor_declaration) @declaration.constructor.node
+(annotation_type_element_declaration) @declaration.annotation_element.node
+(field_declaration) @declaration.field.node
+(enum_constant) @declaration.enum_constant.node
+(local_variable_declaration) @declaration.local.node
+(formal_parameter) @declaration.parameter.node
+(spread_parameter) @declaration.parameter.node
+(receiver_parameter) @declaration.parameter.node
+(type_parameter) @declaration.type_parameter.node
+(lambda_expression) @declaration.lambda_parameter.node

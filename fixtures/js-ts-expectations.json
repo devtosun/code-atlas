@@ -1,0 +1,213 @@
+{
+  "schema_version": 1,
+  "fixtures": [
+    {
+      "id": "javascript-core",
+      "file": "fixtures/javascript/invoice.js",
+      "language": "javascript",
+      "expected_parse": "complete",
+      "required_declarations": [
+        {"kind": "class", "name": "Invoice", "attribute": "role:type", "signature_contains": null},
+        {"kind": "constructor", "name": "constructor", "attribute": "role:value", "signature_contains": "constructor(amount)"},
+        {"kind": "parameter", "name": "twice", "attribute": "role:value", "signature_contains": null},
+        {"kind": "function", "name": "load", "attribute": "async", "signature_contains": "async function load"}
+      ],
+      "required_imports": [
+        {"kind": "esm_import", "path": "./math.js", "alias": "twice", "attribute": "imported:double", "limitation": "module_resolution_not_performed"}
+      ],
+      "required_calls": [
+        {"kind": "function", "name": "twice", "attribute": null, "limitation": "call_target_not_resolved"},
+        {"kind": "function", "name": "loader", "attribute": "awaited", "limitation": "call_target_not_resolved"}
+      ],
+      "required_references": [],
+      "forbidden_observations": ["phantom_call"]
+    },
+    {
+      "id": "javascript-modules",
+      "file": "fixtures/javascript/modules.js",
+      "language": "javascript",
+      "expected_parse": "complete",
+      "required_declarations": [
+        {"kind": "function", "name": "optional", "attribute": "async", "signature_contains": "async function optional"},
+        {"kind": "function_binding", "name": "shadow", "attribute": "role:value", "signature_contains": "=>"}
+      ],
+      "required_imports": [
+        {"kind": "esm_import", "path": "./cycle-a.js", "alias": "primary", "attribute": "imported:default", "limitation": "module_resolution_not_performed"},
+        {"kind": "esm_import", "path": "./cycle-a.js", "alias": "importedValue", "attribute": "imported:value", "limitation": "module_resolution_not_performed"},
+        {"kind": "reexport", "path": "./cycle-a.js", "alias": "cycleNext", "attribute": "local:next", "limitation": "reexport_cycle_guard_required"},
+        {"kind": "commonjs_require", "path": "./legacy.cjs", "alias": "legacy", "attribute": "static_specifier", "limitation": "module_resolution_not_performed"},
+        {"kind": "commonjs_require", "path": "moduleName", "alias": "deferred", "attribute": "dynamic_specifier", "limitation": "dynamic_module_specifier_not_resolved"},
+        {"kind": "commonjs_export", "path": "module.exports", "alias": "exports", "attribute": "role:value", "limitation": "commonjs_interop_syntax_only"},
+        {"kind": "commonjs_export", "path": "exports.named", "alias": "named", "attribute": "role:value", "limitation": "commonjs_interop_syntax_only"}
+      ],
+      "required_calls": [
+        {"kind": "method", "name": "loader?.load", "attribute": "optional_chain", "limitation": "dispatch_target_not_resolved"},
+        {"kind": "method", "name": "object[key]", "attribute": "computed_target", "limitation": "dynamic_property_target_not_resolved"},
+        {"kind": "constructor", "name": "Widget", "attribute": null, "limitation": "call_target_not_resolved"},
+        {"kind": "dynamic_import", "name": "import", "attribute": null, "limitation": "module_resolution_not_performed"}
+      ],
+      "required_references": [],
+      "forbidden_observations": ["phantom_call"]
+    },
+    {
+      "id": "javascript-cycle-a",
+      "file": "fixtures/javascript/cycle-a.js",
+      "language": "javascript",
+      "expected_parse": "complete",
+      "required_declarations": [
+        {"kind": "variable", "name": "value", "attribute": "role:value", "signature_contains": null}
+      ],
+      "required_imports": [
+        {"kind": "reexport", "path": "./modules.js", "alias": "next", "attribute": "local:cycleNext", "limitation": "reexport_cycle_guard_required"}
+      ],
+      "required_calls": [],
+      "required_references": [],
+      "forbidden_observations": []
+    },
+    {
+      "id": "jsx-components",
+      "file": "fixtures/javascript/components.jsx",
+      "language": "jsx",
+      "expected_parse": "complete",
+      "required_declarations": [
+        {"kind": "function_binding", "name": "Card", "attribute": "role:value", "signature_contains": "=>"},
+        {"kind": "function_binding", "name": "Empty", "attribute": "role:value", "signature_contains": "=>"}
+      ],
+      "required_imports": [
+        {"kind": "esm_import", "path": "./ui.js", "alias": "Panel", "attribute": "imported:Panel", "limitation": "module_resolution_not_performed"}
+      ],
+      "required_calls": [
+        {"kind": "function", "name": "onSelect", "attribute": null, "limitation": "call_target_not_resolved"}
+      ],
+      "required_references": [
+        {"kind": "jsx_component", "name": "Panel.Item", "attribute": "jsx_component_syntax", "limitation": "jsx_tag_not_a_call_edge"},
+        {"kind": "jsx_component", "name": "span", "attribute": "jsx_intrinsic_syntax", "limitation": "jsx_tag_not_a_call_edge"},
+        {"kind": "jsx_component", "name": "Widget", "attribute": "jsx_component_syntax", "limitation": "jsx_tag_not_a_call_edge"}
+      ],
+      "forbidden_observations": ["Phantom", "phantom_call"]
+    },
+    {
+      "id": "typescript-advanced",
+      "file": "fixtures/typescript/advanced.ts",
+      "language": "typescript",
+      "expected_parse": "complete",
+      "required_declarations": [
+        {"kind": "interface", "name": "Token", "attribute": "role:type", "signature_contains": null},
+        {"kind": "function_binding", "name": "Token", "attribute": "role:value", "signature_contains": "<T>"},
+        {"kind": "type_alias", "name": "Mapper", "attribute": "role:type", "signature_contains": null},
+        {"kind": "enum", "name": "Mode", "attribute": "role:type", "signature_contains": null},
+        {"kind": "namespace", "name": "Billing", "attribute": "role:namespace", "signature_contains": null},
+        {"kind": "function_overload", "name": "parse", "attribute": "overload_declaration", "signature_contains": "value: string"},
+        {"kind": "class", "name": "Repository", "attribute": "decorator:@sealed", "signature_contains": null},
+        {"kind": "method", "name": "save", "attribute": "decorator:@logged", "signature_contains": "async save<U>"}
+      ],
+      "required_imports": [
+        {"kind": "esm_import", "path": "./models", "alias": "InvoiceShape", "attribute": "role:type", "limitation": "module_resolution_not_performed"},
+        {"kind": "esm_import", "path": "./models", "alias": "runtimeTotal", "attribute": "role:value", "limitation": "module_resolution_not_performed"},
+        {"kind": "reexport", "path": "./models", "alias": "ExternalId", "attribute": "role:type", "limitation": "reexport_cycle_guard_required"}
+      ],
+      "required_calls": [
+        {"kind": "method", "name": "object[key]", "attribute": "computed_target", "limitation": "dynamic_property_target_not_resolved"}
+      ],
+      "required_references": [
+        {"kind": "decorator", "name": "@sealed", "attribute": "role:decorator", "limitation": "decorator_target_not_resolved"},
+        {"kind": "decorator", "name": "@logged", "attribute": "role:decorator", "limitation": "decorator_target_not_resolved"}
+      ],
+      "forbidden_observations": ["yorum_çağrısı"]
+    },
+    {
+      "id": "tsx-generics",
+      "file": "fixtures/typescript/GenericList.tsx",
+      "language": "tsx",
+      "expected_parse": "complete",
+      "required_declarations": [
+        {"kind": "function_binding", "name": "GenericList", "attribute": "generic_syntax", "signature_contains": "<T,>"},
+        {"kind": "function_binding", "name": "Empty", "attribute": "role:value", "signature_contains": "=>"}
+      ],
+      "required_imports": [
+        {"kind": "esm_import", "path": "./props", "alias": "Props", "attribute": "role:type", "limitation": "module_resolution_not_performed"},
+        {"kind": "esm_import", "path": "./Item", "alias": "Row", "attribute": "imported:Item", "limitation": "module_resolution_not_performed"}
+      ],
+      "required_calls": [
+        {"kind": "method", "name": "items.map", "attribute": null, "limitation": "dispatch_target_not_resolved"},
+        {"kind": "function", "name": "render", "attribute": null, "limitation": "call_target_not_resolved"}
+      ],
+      "required_references": [
+        {"kind": "jsx_component", "name": "Row", "attribute": "jsx_component_syntax", "limitation": "jsx_tag_not_a_call_edge"},
+        {"kind": "jsx_component", "name": "section", "attribute": "jsx_intrinsic_syntax", "limitation": "jsx_tag_not_a_call_edge"},
+        {"kind": "jsx_component", "name": "Widget", "attribute": "jsx_component_syntax", "limitation": "jsx_tag_not_a_call_edge"}
+      ],
+      "forbidden_observations": []
+    },
+    {
+      "id": "typescript-declarations",
+      "file": "fixtures/typescript/contracts.d.ts",
+      "language": "typescript",
+      "expected_parse": "complete",
+      "required_declarations": [
+        {"kind": "interface", "name": "Service", "attribute": "role:type", "signature_contains": null},
+        {"kind": "function_overload", "name": "create", "attribute": "generic_syntax", "signature_contains": "create<T>"}
+      ],
+      "required_imports": [],
+      "required_calls": [],
+      "required_references": [],
+      "forbidden_observations": []
+    },
+    {
+      "id": "typescript-mts-routing",
+      "file": "fixtures/typescript/module.mts",
+      "language": "typescript",
+      "expected_parse": "complete",
+      "required_declarations": [
+        {"kind": "variable", "name": "moduleValue", "attribute": "role:value", "signature_contains": null}
+      ],
+      "required_imports": [],
+      "required_calls": [],
+      "required_references": [],
+      "forbidden_observations": []
+    },
+    {
+      "id": "typescript-cts-routing",
+      "file": "fixtures/typescript/legacy.cts",
+      "language": "typescript",
+      "expected_parse": "complete",
+      "required_declarations": [
+        {"kind": "variable", "name": "legacyValue", "attribute": "role:value", "signature_contains": null}
+      ],
+      "required_imports": [
+        {"kind": "commonjs_require", "path": "./legacy.cjs", "alias": "legacyValue", "attribute": "static_specifier", "limitation": "module_resolution_not_performed"}
+      ],
+      "required_calls": [
+        {"kind": "require", "name": "require", "attribute": null, "limitation": "module_resolution_not_performed"}
+      ],
+      "required_references": [],
+      "forbidden_observations": []
+    },
+    {
+      "id": "typescript-malformed",
+      "file": "fixtures/partial/broken.ts",
+      "language": "typescript",
+      "expected_parse": "partial_with_diagnostic",
+      "required_declarations": [
+        {"kind": "function", "name": "complete", "attribute": "role:value", "signature_contains": "function complete"}
+      ],
+      "required_imports": [],
+      "required_calls": [],
+      "required_references": [],
+      "forbidden_observations": []
+    },
+    {
+      "id": "typescript-unicode",
+      "file": "fixtures/unicode/unicode.ts",
+      "language": "typescript",
+      "expected_parse": "complete",
+      "required_declarations": [
+        {"kind": "function", "name": "selam", "attribute": "role:value", "signature_contains": "isim: string"}
+      ],
+      "required_imports": [],
+      "required_calls": [],
+      "required_references": [],
+      "forbidden_observations": []
+    }
+  ]
+}

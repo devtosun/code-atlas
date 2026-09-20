@@ -1,0 +1,6 @@
+interface:
+  display_name: "Tree-sitter Languages"
+  short_description: "CodeAtlas: tree-sitter languages"
+  default_prompt: "Use $ca-treesitter-language to carry out the requested CodeAtlas phase within its acceptance gates."
+policy:
+  allow_implicit_invocation: true

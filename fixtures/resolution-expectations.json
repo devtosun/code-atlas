@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "corpus_root": "fixtures",
+  "labels": [
+    {"language":"rust","source_path":"rust/main.rs","source_category":"import","source_spelling":"math::double","occurrence":0,"relationship":"imports","resolution":"lexically_resolved","candidate_count":1,"targets":[{"path":"rust/math.rs","name":"double"}]},
+    {"language":"rust","source_path":"rust/main.rs","source_category":"call_site","source_spelling":"twice","occurrence":0,"relationship":"calls","resolution":"lexically_resolved","candidate_count":1,"targets":[{"path":"rust/math.rs","name":"double"}]},
+    {"language":"rust","source_path":"rust/math.rs","source_category":"call_site","source_spelling":"double","occurrence":0,"relationship":"calls","resolution":"lexically_resolved","candidate_count":1,"targets":[{"path":"rust/math.rs","name":"double"}]},
+    {"language":"rust","source_path":"rust/main.rs","source_category":"call_site","source_spelling":"invoice.total","occurrence":0,"relationship":"calls","resolution":"candidate","candidate_count":1,"targets":[{"path":"rust/main.rs","name":"total"}]},
+    {"language":"rust","source_path":"rust/domain.rs","source_category":"import","source_spelling":"std::collections::HashMap","occurrence":0,"relationship":"imports","resolution":"syntax_observation","candidate_count":1,"targets":[]},
+
+    {"language":"go","source_path":"go/invoice.go","source_category":"call_site","source_spelling":"double","occurrence":0,"relationship":"calls","resolution":"lexically_resolved","candidate_count":1,"targets":[{"path":"go/math.go","name":"double"}]},
+    {"language":"go","source_path":"go/math.go","source_category":"call_site","source_spelling":"double","occurrence":0,"relationship":"calls","resolution":"lexically_resolved","candidate_count":1,"targets":[{"path":"go/math.go","name":"double"}]},
+    {"language":"go","source_path":"go/invoice.go","source_category":"call_site","source_spelling":"i.Total","occurrence":0,"relationship":"calls","resolution":"candidate","candidate_count":1,"targets":[{"path":"go/invoice.go","name":"Total"}]},
+    {"language":"go","source_path":"go/invoice.go","source_category":"call_site","source_spelling":"r.Save","occurrence":0,"relationship":"calls","resolution":"candidate","candidate_count":1,"targets":[{"path":"go/invoice.go","name":"Save"}]},
+    {"language":"go","source_path":"go/domain.go","source_category":"import","source_spelling":"example.com/external/client","occurrence":0,"relationship":"imports","resolution":"syntax_observation","candidate_count":1,"targets":[]},
+
+    {"language":"java","source_path":"java/Invoice.java","source_category":"call_site","source_spelling":"twice","occurrence":0,"relationship":"calls","resolution":"candidate","candidate_count":1,"targets":[{"path":"java/Calculator.java","name":"twice"}]},
+    {"language":"java","source_path":"java/Invoice.java","source_category":"call_site","source_spelling":"total","occurrence":0,"relationship":"calls","resolution":"candidate","candidate_count":2,"targets":[{"path":"java/Invoice.java","name":"total"},{"path":"java/Invoice.java","name":"total"}]},
+    {"language":"java","source_path":"java/Invoice.java","source_category":"reference","source_spelling":"amount","occurrence":0,"relationship":"references","resolution":"lexically_resolved","candidate_count":1,"targets":[{"path":"java/Invoice.java","name":"amount"}]},
+    {"language":"java","source_path":"java/Advanced.java","source_category":"import","source_spelling":"java.util.List","occurrence":0,"relationship":"imports","resolution":"syntax_observation","candidate_count":1,"targets":[]},
+    {"language":"java","source_path":"java/Advanced.java","source_category":"call_site","source_spelling":"save","occurrence":0,"relationship":"calls","resolution":"candidate","candidate_count":1,"targets":[{"path":"java/Advanced.java","name":"save"}]},
+
+    {"language":"csharp","source_path":"csharp/Workflow.cs","source_category":"reference","source_spelling":"IRepository","occurrence":0,"relationship":"references","resolution":"lexically_resolved","candidate_count":1,"targets":[{"path":"csharp/Invoice.cs","name":"IRepository"}]},
+    {"language":"csharp","source_path":"csharp/Workflow.cs","source_category":"reference","source_spelling":"Invoice","occurrence":0,"relationship":"references","resolution":"candidate","candidate_count":2,"targets":[{"path":"csharp/Invoice.cs","name":"Invoice"},{"path":"csharp/Invoice.Metadata.cs","name":"Invoice"}]},
+    {"language":"csharp","source_path":"csharp/Workflow.cs","source_category":"call_site","source_spelling":"Save","occurrence":0,"relationship":"calls","resolution":"candidate","candidate_count":1,"targets":[{"path":"csharp/Invoice.cs","name":"Save"}]},
+    {"language":"csharp","source_path":"csharp/Invoice.cs","source_category":"call_site","source_spelling":"Total","occurrence":0,"relationship":"calls","resolution":"candidate","candidate_count":2,"targets":[{"path":"csharp/Invoice.cs","name":"Total"},{"path":"csharp/Invoice.cs","name":"Total"}]},
+    {"language":"csharp","source_path":"csharp/Advanced.cs","source_category":"import","source_spelling":"System","occurrence":0,"relationship":"imports","resolution":"syntax_observation","candidate_count":1,"targets":[]},
+
+    {"language":"dart","source_path":"dart/invoice_card.dart","source_category":"import","source_spelling":"invoice.dart","occurrence":0,"relationship":"imports","resolution":"lexically_resolved","candidate_count":1,"targets":[{"path":"dart/invoice.dart","name":null}]},
+    {"language":"dart","source_path":"dart/invoice_card.dart","source_category":"reference","source_spelling":"Invoice","occurrence":0,"relationship":"references","resolution":"lexically_resolved","candidate_count":1,"targets":[{"path":"dart/invoice.dart","name":"Invoice"}]},
+    {"language":"dart","source_path":"dart/invoice_card.dart","source_category":"call_site","source_spelling":"label","occurrence":0,"relationship":"calls","resolution":"unresolved","candidate_count":0,"targets":[]},
+    {"language":"dart","source_path":"dart/invoice.dart","source_category":"call_site","source_spelling":"twice","occurrence":0,"relationship":"calls","resolution":"candidate","candidate_count":1,"targets":[{"path":"dart/math.dart","name":"twice"}]},
+    {"language":"dart","source_path":"dart/invoice_card.dart","source_category":"import","source_spelling":"package:flutter/widgets.dart","occurrence":0,"relationship":"imports","resolution":"syntax_observation","candidate_count":1,"targets":[]},
+
+    {"language":"javascript","source_path":"javascript/invoice.js","source_category":"import","source_spelling":"./math.js","occurrence":0,"relationship":"imports","resolution":"lexically_resolved","candidate_count":1,"targets":[{"path":"javascript/math.js","name":"double"}]},
+    {"language":"javascript","source_path":"javascript/invoice.js","source_category":"call_site","source_spelling":"twice","occurrence":0,"relationship":"calls","resolution":"lexically_resolved","candidate_count":1,"targets":[{"path":"javascript/math.js","name":"double"}]},
+    {"language":"javascript","source_path":"javascript/invoice.js","source_category":"call_site","source_spelling":"twice","occurrence":1,"relationship":"calls","resolution":"lexically_resolved","candidate_count":1,"targets":[{"path":"javascript/invoice.js","name":"twice"}]},
+    {"language":"javascript","source_path":"javascript/modules.js","source_category":"call_site","source_spelling":"object[key]","occurrence":0,"relationship":"calls","resolution":"unresolved","candidate_count":0,"targets":[]},
+    {"language":"javascript","source_path":"javascript/cycle-consumer.js","source_category":"call_site","source_spelling":"next","occurrence":0,"relationship":"calls","resolution":"unresolved","candidate_count":0,"targets":[]},
+
+    {"language":"typescript","source_path":"typescript/InvoiceCard.tsx","source_category":"import","source_spelling":"./models","occurrence":0,"relationship":"imports","resolution":"lexically_resolved","candidate_count":1,"targets":[{"path":"typescript/models.ts","name":"total"}]},
+    {"language":"typescript","source_path":"typescript/InvoiceCard.tsx","source_category":"import","source_spelling":"./models","occurrence":1,"relationship":"imports","resolution":"lexically_resolved","candidate_count":1,"targets":[{"path":"typescript/models.ts","name":"Invoice"}]},
+    {"language":"typescript","source_path":"typescript/InvoiceCard.tsx","source_category":"call_site","source_spelling":"total","occurrence":0,"relationship":"calls","resolution":"lexically_resolved","candidate_count":1,"targets":[{"path":"typescript/models.ts","name":"total"}]},
+    {"language":"typescript","source_path":"typescript/InvoiceCard.tsx","source_category":"call_site","source_spelling":"onSelect","occurrence":0,"relationship":"calls","resolution":"lexically_resolved","candidate_count":1,"targets":[{"path":"typescript/InvoiceCard.tsx","name":"onSelect"}]},
+    {"language":"typescript","source_path":"typescript/advanced.ts","source_category":"call_site","source_spelling":"object[key]","occurrence":0,"relationship":"calls","resolution":"unresolved","candidate_count":0,"targets":[]}
+  ]
+}

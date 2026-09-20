@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "corpus": "fixtures/resolution-expectations.json",
+  "metrics": [
+    {
+      "language": "csharp",
+      "labelled_sites": 5,
+      "syntax_coverage": {"numerator": 5, "denominator": 5},
+      "binding_precision": {"numerator": 6, "denominator": 6},
+      "binding_recall": {"numerator": 6, "denominator": 6},
+      "unresolved_rate": {"numerator": 0, "denominator": 5},
+      "candidate_sites": 3,
+      "external_observation_sites": 1
+    },
+    {
+      "language": "dart",
+      "labelled_sites": 5,
+      "syntax_coverage": {"numerator": 5, "denominator": 5},
+      "binding_precision": {"numerator": 3, "denominator": 3},
+      "binding_recall": {"numerator": 3, "denominator": 3},
+      "unresolved_rate": {"numerator": 1, "denominator": 5},
+      "candidate_sites": 1,
+      "external_observation_sites": 1
+    },
+    {
+      "language": "go",
+      "labelled_sites": 5,
+      "syntax_coverage": {"numerator": 5, "denominator": 5},
+      "binding_precision": {"numerator": 4, "denominator": 4},
+      "binding_recall": {"numerator": 4, "denominator": 4},
+      "unresolved_rate": {"numerator": 0, "denominator": 5},
+      "candidate_sites": 2,
+      "external_observation_sites": 1
+    },
+    {
+      "language": "java",
+      "labelled_sites": 5,
+      "syntax_coverage": {"numerator": 5, "denominator": 5},
+      "binding_precision": {"numerator": 5, "denominator": 5},
+      "binding_recall": {"numerator": 5, "denominator": 5},
+      "unresolved_rate": {"numerator": 0, "denominator": 5},
+      "candidate_sites": 3,
+      "external_observation_sites": 1
+    },
+    {
+      "language": "javascript",
+      "labelled_sites": 5,
+      "syntax_coverage": {"numerator": 5, "denominator": 5},
+      "binding_precision": {"numerator": 3, "denominator": 3},
+      "binding_recall": {"numerator": 3, "denominator": 3},
+      "unresolved_rate": {"numerator": 2, "denominator": 5},
+      "candidate_sites": 0,
+      "external_observation_sites": 0
+    },
+    {
+      "language": "rust",
+      "labelled_sites": 5,
+      "syntax_coverage": {"numerator": 5, "denominator": 5},
+      "binding_precision": {"numerator": 4, "denominator": 4},
+      "binding_recall": {"numerator": 4, "denominator": 4},
+      "unresolved_rate": {"numerator": 0, "denominator": 5},
+      "candidate_sites": 1,
+      "external_observation_sites": 1
+    },
+    {
+      "language": "typescript",
+      "labelled_sites": 5,
+      "syntax_coverage": {"numerator": 5, "denominator": 5},
+      "binding_precision": {"numerator": 4, "denominator": 4},
+      "binding_recall": {"numerator": 4, "denominator": 4},
+      "unresolved_rate": {"numerator": 1, "denominator": 5},
+      "candidate_sites": 0,
+      "external_observation_sites": 0
+    }
+  ]
+}

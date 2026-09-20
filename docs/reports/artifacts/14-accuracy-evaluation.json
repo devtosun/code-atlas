@@ -1,0 +1,346 @@
+{
+  "schema_version": 1,
+  "fixture_provenance": [
+    "fixtures/rust-go-expectations.json",
+    "fixtures/js-ts-expectations.json",
+    "fixtures/csharp-java-expectations.json",
+    "fixtures/dart-expectations.json"
+  ],
+  "fixture_gate": "cargo run -p xtask --locked --offline -- verify",
+  "declaration_anchor_metrics": [
+    {
+      "language_or_dialect": "csharp",
+      "fixtures": 7,
+      "required_declaration_recall": {
+        "numerator": 28,
+        "denominator": 28
+      },
+      "forbidden_observation_checks": {
+        "unexpected": 0,
+        "denominator": 4
+      },
+      "declaration_precision": {
+        "numerator": 27,
+        "denominator": 27
+      },
+      "precision_provenance": "fixtures/parser-kernel.golden"
+    },
+    {
+      "language_or_dialect": "dart",
+      "fixtures": 8,
+      "required_declaration_recall": {
+        "numerator": 39,
+        "denominator": 39
+      },
+      "forbidden_observation_checks": {
+        "unexpected": 0,
+        "denominator": 5
+      },
+      "declaration_precision": {
+        "numerator": 32,
+        "denominator": 32
+      },
+      "precision_provenance": "fixtures/parser-kernel.golden"
+    },
+    {
+      "language_or_dialect": "go",
+      "fixtures": 4,
+      "required_declaration_recall": {
+        "numerator": 23,
+        "denominator": 23
+      },
+      "forbidden_observation_checks": {
+        "unexpected": 0,
+        "denominator": 4
+      },
+      "declaration_precision": {
+        "numerator": 20,
+        "denominator": 20
+      },
+      "precision_provenance": "fixtures/parser-kernel.golden"
+    },
+    {
+      "language_or_dialect": "java",
+      "fixtures": 4,
+      "required_declaration_recall": {
+        "numerator": 18,
+        "denominator": 18
+      },
+      "forbidden_observation_checks": {
+        "unexpected": 0,
+        "denominator": 1
+      },
+      "declaration_precision": {
+        "numerator": 14,
+        "denominator": 14
+      },
+      "precision_provenance": "fixtures/parser-kernel.golden"
+    },
+    {
+      "language_or_dialect": "javascript",
+      "fixtures": 3,
+      "required_declaration_recall": {
+        "numerator": 7,
+        "denominator": 7
+      },
+      "forbidden_observation_checks": {
+        "unexpected": 0,
+        "denominator": 2
+      },
+      "declaration_precision": {
+        "numerator": 16,
+        "denominator": 16
+      },
+      "precision_provenance": "fixtures/parser-kernel.golden"
+    },
+    {
+      "language_or_dialect": "jsx",
+      "fixtures": 1,
+      "required_declaration_recall": {
+        "numerator": 2,
+        "denominator": 2
+      },
+      "forbidden_observation_checks": {
+        "unexpected": 0,
+        "denominator": 2
+      },
+      "declaration_precision": {
+        "numerator": 3,
+        "denominator": 3
+      },
+      "precision_provenance": "fixtures/parser-kernel.golden"
+    },
+    {
+      "language_or_dialect": "rust",
+      "fixtures": 4,
+      "required_declaration_recall": {
+        "numerator": 24,
+        "denominator": 24
+      },
+      "forbidden_observation_checks": {
+        "unexpected": 0,
+        "denominator": 4
+      },
+      "declaration_precision": {
+        "numerator": 12,
+        "denominator": 12
+      },
+      "precision_provenance": "fixtures/parser-kernel.golden"
+    },
+    {
+      "language_or_dialect": "tsx",
+      "fixtures": 1,
+      "required_declaration_recall": {
+        "numerator": 2,
+        "denominator": 2
+      },
+      "forbidden_observation_checks": {
+        "unexpected": 0,
+        "denominator": 0
+      },
+      "declaration_precision": {
+        "numerator": 5,
+        "denominator": 5
+      },
+      "precision_provenance": "fixtures/parser-kernel.golden"
+    },
+    {
+      "language_or_dialect": "typescript",
+      "fixtures": 6,
+      "required_declaration_recall": {
+        "numerator": 14,
+        "denominator": 14
+      },
+      "forbidden_observation_checks": {
+        "unexpected": 0,
+        "denominator": 1
+      },
+      "declaration_precision": {
+        "numerator": 14,
+        "denominator": 14
+      },
+      "precision_provenance": "fixtures/parser-kernel.golden"
+    }
+  ],
+  "reference_binding_metrics": [
+    {
+      "language": "csharp",
+      "labelled_sites": 5,
+      "syntax_coverage": {
+        "numerator": 5,
+        "denominator": 5
+      },
+      "binding_precision": {
+        "numerator": 6,
+        "denominator": 6
+      },
+      "binding_recall": {
+        "numerator": 6,
+        "denominator": 6
+      },
+      "unresolved_rate": {
+        "numerator": 0,
+        "denominator": 5
+      },
+      "candidate_sites": 3,
+      "external_observation_sites": 1
+    },
+    {
+      "language": "dart",
+      "labelled_sites": 5,
+      "syntax_coverage": {
+        "numerator": 5,
+        "denominator": 5
+      },
+      "binding_precision": {
+        "numerator": 3,
+        "denominator": 3
+      },
+      "binding_recall": {
+        "numerator": 3,
+        "denominator": 3
+      },
+      "unresolved_rate": {
+        "numerator": 1,
+        "denominator": 5
+      },
+      "candidate_sites": 1,
+      "external_observation_sites": 1
+    },
+    {
+      "language": "go",
+      "labelled_sites": 5,
+      "syntax_coverage": {
+        "numerator": 5,
+        "denominator": 5
+      },
+      "binding_precision": {
+        "numerator": 4,
+        "denominator": 4
+      },
+      "binding_recall": {
+        "numerator": 4,
+        "denominator": 4
+      },
+      "unresolved_rate": {
+        "numerator": 0,
+        "denominator": 5
+      },
+      "candidate_sites": 2,
+      "external_observation_sites": 1
+    },
+    {
+      "language": "java",
+      "labelled_sites": 5,
+      "syntax_coverage": {
+        "numerator": 5,
+        "denominator": 5
+      },
+      "binding_precision": {
+        "numerator": 5,
+        "denominator": 5
+      },
+      "binding_recall": {
+        "numerator": 5,
+        "denominator": 5
+      },
+      "unresolved_rate": {
+        "numerator": 0,
+        "denominator": 5
+      },
+      "candidate_sites": 3,
+      "external_observation_sites": 1
+    },
+    {
+      "language": "javascript",
+      "labelled_sites": 5,
+      "syntax_coverage": {
+        "numerator": 5,
+        "denominator": 5
+      },
+      "binding_precision": {
+        "numerator": 3,
+        "denominator": 3
+      },
+      "binding_recall": {
+        "numerator": 3,
+        "denominator": 3
+      },
+      "unresolved_rate": {
+        "numerator": 2,
+        "denominator": 5
+      },
+      "candidate_sites": 0,
+      "external_observation_sites": 0
+    },
+    {
+      "language": "rust",
+      "labelled_sites": 5,
+      "syntax_coverage": {
+        "numerator": 5,
+        "denominator": 5
+      },
+      "binding_precision": {
+        "numerator": 4,
+        "denominator": 4
+      },
+      "binding_recall": {
+        "numerator": 4,
+        "denominator": 4
+      },
+      "unresolved_rate": {
+        "numerator": 0,
+        "denominator": 5
+      },
+      "candidate_sites": 1,
+      "external_observation_sites": 1
+    },
+    {
+      "language": "typescript",
+      "labelled_sites": 5,
+      "syntax_coverage": {
+        "numerator": 5,
+        "denominator": 5
+      },
+      "binding_precision": {
+        "numerator": 4,
+        "denominator": 4
+      },
+      "binding_recall": {
+        "numerator": 4,
+        "denominator": 4
+      },
+      "unresolved_rate": {
+        "numerator": 1,
+        "denominator": 5
+      },
+      "candidate_sites": 0,
+      "external_observation_sites": 0
+    }
+  ],
+  "reference_binding_provenance": "fixtures/resolution-expectations.json",
+  "larger_authorized_real_corpus": {
+    "kind": "hand-reviewed-project-source-declaration-corpus",
+    "authorization": "project-owned-source-authorized-for-local-evaluation",
+    "provenance": "CodeAtlas source files in this repository; evaluated locally and never uploaded",
+    "files": 5,
+    "bytes": 6083,
+    "language": "rust",
+    "hand_reviewed_declaration_precision": {
+      "numerator": 78,
+      "denominator": 78
+    },
+    "labels": "fixtures/phase14-real-corpus.golden",
+    "source_hash_manifest": "fixtures/phase14-real-corpus.json"
+  },
+  "capacity_corpus": {
+    "kind": "deterministic_generated_rust_v1",
+    "authorization": "generated locally for this evaluation; no private source",
+    "files": 100000,
+    "expected_declarations": 100000,
+    "observed_active_symbols": 100000,
+    "files_failed": 0,
+    "scope": "capacity correctness only; generated Rust is not a real-world accuracy corpus"
+  },
+  "release_limitation": "The corpus is locally authorized project source and curated fixtures. It is not a representative multi-repository accuracy survey or compiler-semantic proof."
+}

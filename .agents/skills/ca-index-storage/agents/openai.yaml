@@ -1,0 +1,6 @@
+interface:
+  display_name: "Index Storage"
+  short_description: "CodeAtlas: index storage"
+  default_prompt: "Use $ca-index-storage to carry out the requested CodeAtlas phase within its acceptance gates."
+policy:
+  allow_implicit_invocation: true

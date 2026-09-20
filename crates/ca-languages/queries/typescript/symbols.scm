@@ -1,0 +1,30 @@
+; Phase 05 TypeScript declarations and lexical scopes.
+(program) @scope.file.node
+(statement_block) @scope.block.node
+(class_body) @scope.class.node
+(interface_body) @scope.interface.node
+(function_declaration) @scope.function.node
+(generator_function_declaration) @scope.function.node
+(function_expression) @scope.function.node
+(generator_function) @scope.function.node
+(function_signature) @scope.function.node
+(arrow_function) @scope.arrow.node
+(method_definition) @scope.method.node
+(method_signature) @scope.method.node
+(abstract_method_signature) @scope.method.node
+(internal_module) @scope.namespace.node
+
+(class_declaration) @declaration.class.node
+(abstract_class_declaration) @declaration.class.node
+(function_declaration) @declaration.function.node
+(generator_function_declaration) @declaration.function.node
+(function_signature) @declaration.function_overload.node
+(method_definition) @declaration.method.node
+(method_signature) @declaration.method_signature.node
+(abstract_method_signature) @declaration.method_signature.node
+(variable_declarator) @declaration.binding.node
+(formal_parameters) @declaration.parameter.node
+(interface_declaration) @declaration.interface.node
+(type_alias_declaration) @declaration.type_alias.node
+(enum_declaration) @declaration.enum.node
+(internal_module) @declaration.namespace.node

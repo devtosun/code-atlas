@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "kind": "hand-reviewed-exhaustive-declaration-labels",
+  "reviewed_on": "2026-09-20",
+  "labels": "fixtures/parser-kernel.golden",
+  "scope": "Every emitted declaration kind, spelling and byte range in the referenced golden was reviewed against the corresponding project-owned fixture source. Imports, references and call edges are evaluated by their dedicated fixture and resolution gates.",
+  "authorization": "project-owned fixtures authorized for local evaluation",
+  "limitations": "This is a curated syntax corpus, not a representative survey of public repositories or compiler semantics."
+}

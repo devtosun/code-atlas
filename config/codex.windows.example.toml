@@ -1,0 +1,8 @@
+# MERGE only this table into your existing configuration after backup/review.
+# TOML literal strings avoid Windows backslash escaping.
+[mcp_servers.codeatlas]
+command = 'C:\Tools\CodeAtlas\codeatlas.exe'
+args = ['serve', '--root', 'C:\Projects\MyProject']
+required = false
+startup_timeout_sec = 10
+tool_timeout_sec = 60

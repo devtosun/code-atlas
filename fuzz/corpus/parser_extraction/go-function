@@ -1,0 +1,2 @@
+Bpackage main
+func main() { println("seed") }

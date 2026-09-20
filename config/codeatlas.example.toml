@@ -1,0 +1,40 @@
+# Proposed application configuration schema; the current CLI does not load this file.
+# Not a configuration file for the existing codebase-memory-mcp project.
+schema_version = 1
+
+[index]
+auto_index = false
+watch = false
+max_file_bytes = 2097152
+max_files = 100000
+parser_workers = 4
+queue_capacity = 32
+parse_budget_ms = 1000
+query_budget_ms = 500
+max_captures_per_file = 50000
+
+[retrieval]
+default_limit = 20
+max_limit = 200
+max_response_bytes = 65536
+max_snippet_bytes = 4096
+max_graph_depth = 8
+max_graph_nodes = 500
+
+[watch]
+debounce_ms = 250
+reconcile_interval_seconds = 60
+polling_fallback = true
+
+[memory]
+enabled = true
+allow_writes = false
+max_record_bytes = 16384
+
+[privacy]
+follow_symlinks = false
+include_documentation = false
+log_source_text = false
+
+# data_dir, privileged root authorization, sidecar permissions, or network-enabling
+# settings must come from trusted CLI/user config, not arbitrary repository files.

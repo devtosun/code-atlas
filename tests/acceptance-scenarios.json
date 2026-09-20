@@ -1,0 +1,308 @@
+{
+  "schema_version": 1,
+  "kind": "implementation-acceptance-design",
+  "execution_status": "PARTIALLY_EXECUTED",
+  "scenarios": [
+    {
+      "id": "P01",
+      "phase": "00",
+      "title": "All grammars load",
+      "pass_criteria": "Load each selected grammar with one pinned runtime; set_language succeeds; parse one fixture per language and JSX/TSX.",
+      "status": "PASS"
+    },
+    {
+      "id": "P02",
+      "phase": "00",
+      "title": "Modern lifecycle",
+      "pass_criteria": "Published rmcp/client pair handles 2026-07-28 discovery/request metadata; verify exact behavior, not just documentation.",
+      "status": "PASS"
+    },
+    {
+      "id": "P03",
+      "phase": "00",
+      "title": "Legacy lifecycle",
+      "pass_criteria": "A 2025-11-25 initialize/initialized client reaches tools/list with the same server build.",
+      "status": "PASS"
+    },
+    {
+      "id": "P04",
+      "phase": "01",
+      "title": "Cold startup",
+      "pass_criteria": "Discovery, tools/list and status respond without scan/index or waiting for DB migration/owner lock; measure latency.",
+      "status": "PASS"
+    },
+    {
+      "id": "P05",
+      "phase": "01",
+      "title": "Strict stdio",
+      "pass_criteria": "Every stdout line is a valid version-correct protocol message; diagnostics go only to stderr.",
+      "status": "PASS"
+    },
+    {
+      "id": "P06",
+      "phase": "02",
+      "title": "Root boundary",
+      "pass_criteria": "Reject ../, absolute sibling, root-prefix lookalike, foreign repository object IDs and percent-encoded URI escapes.",
+      "status": "PARTIAL"
+    },
+    {
+      "id": "P07",
+      "phase": "02",
+      "title": "Links and races",
+      "pass_criteria": "Symlinks/junctions are rejected by default; post-validation path replacement cannot cause a read outside authorized root.",
+      "status": "PARTIAL"
+    },
+    {
+      "id": "P08",
+      "phase": "02",
+      "title": "Secrets denylist",
+      "pass_criteria": "Default scan/query/resource paths do not expose .env, private-key files or credentials even when caller knows the path.",
+      "status": "PASS"
+    },
+    {
+      "id": "P09",
+      "phase": "02",
+      "title": "Writer contention",
+      "pass_criteria": "Second process keeps protocol/status/query responsive; mutation returns bounded WRITER_BUSY; no orphan daemon.",
+      "status": "PASS"
+    },
+    {
+      "id": "P10",
+      "phase": "02",
+      "title": "Worktree isolation",
+      "pass_criteria": "Two worktrees of the same repository use different IDs/DBs; gitless roots are supported.",
+      "status": "PASS"
+    },
+    {
+      "id": "P11",
+      "phase": "02",
+      "title": "SQLite safety",
+      "pass_criteria": "Inspect sqlite_version and FTS5 capabilities from the linked runtime; verify the documented WAL bug fix floor.",
+      "status": "PASS"
+    },
+    {
+      "id": "P12",
+      "phase": "03",
+      "title": "Coordinates",
+      "pass_criteria": "UTF-8 byte offsets/exclusive ends, one-based lines, BOM and CRLF are consistent; no implicit UTF-16 conversion.",
+      "status": "PASS"
+    },
+    {
+      "id": "P13",
+      "phase": "03",
+      "title": "Parser cancellation",
+      "pass_criteria": "Timed-out/cancelled parse and capture flood stay bounded; next normal parse on worker succeeds after reset.",
+      "status": "PASS"
+    },
+    {
+      "id": "P14",
+      "phase": "04",
+      "title": "Rust and Go",
+      "pass_criteria": "Declarations/imports/calls/scopes pass reviewed positive, negative and partial fixtures; trait/interface ambiguity is retained.",
+      "status": "PASS"
+    },
+    {
+      "id": "P15",
+      "phase": "05",
+      "title": "JS TS dialects",
+      "pass_criteria": "JS, JSX, TS and TSX select appropriate grammars; ESM/CommonJS/aliases/re-exports and shadowing are tested.",
+      "status": "PASS"
+    },
+    {
+      "id": "P16",
+      "phase": "06",
+      "title": "CSharp and Java",
+      "pass_criteria": "Overloads stay distinct; C# partial declarations are evidence-grouped; virtual/interface calls do not claim unique concrete targets.",
+      "status": "PASS"
+    },
+    {
+      "id": "P17",
+      "phase": "07",
+      "title": "Dart real coverage",
+      "pass_criteria": "Dart declarations/imports/prefixes/constructors/parts/calls pass; modern construct gaps are named; Flutter runtime not required.",
+      "status": "PASS"
+    },
+    {
+      "id": "P18",
+      "phase": "08",
+      "title": "Atomic activation",
+      "pass_criteria": "Reader sees all of old or new active generation, never mixed file versions/edges/FTS rows.",
+      "status": "PASS"
+    },
+    {
+      "id": "P19",
+      "phase": "08",
+      "title": "Interrupted scan",
+      "pass_criteria": "Permission or I/O traversal failure does not infer mass deletions or activate an incomplete generation.",
+      "status": "PASS"
+    },
+    {
+      "id": "P20",
+      "phase": "08",
+      "title": "Cancel job",
+      "pass_criteria": "Cancellation before activation retains old generation; cancellation after activation reports already_completed.",
+      "status": "PASS"
+    },
+    {
+      "id": "P21",
+      "phase": "08",
+      "title": "Hash not mtime",
+      "pass_criteria": "Changed bytes with unchanged mtime are detected; unchanged files are not reparsed without fingerprint invalidation.",
+      "status": "PASS"
+    },
+    {
+      "id": "P22",
+      "phase": "08",
+      "title": "Owner crash",
+      "pass_criteria": "Kill writer mid-stage; restart marks interrupted job and preserves active generation; OS lock can be acquired safely.",
+      "status": "PASS"
+    },
+    {
+      "id": "P23",
+      "phase": "09",
+      "title": "Resolution honesty",
+      "pass_criteria": "Comment/string names create no calls; shadowing and multiple definitions remain correctly scoped/candidate/unresolved.",
+      "status": "PASS"
+    },
+    {
+      "id": "P24",
+      "phase": "09",
+      "title": "Graph bounds",
+      "pass_criteria": "Cycles, large fanout and deep paths respect depth/node budgets, deterministic ordering and explicit truncation.",
+      "status": "PASS"
+    },
+    {
+      "id": "P25",
+      "phase": "10",
+      "title": "Literal FTS",
+      "pass_criteria": "Quotes, operators, Unicode and malicious FTS-looking input are literal-safe; SQL remains parameterized.",
+      "status": "PASS"
+    },
+    {
+      "id": "P26",
+      "phase": "10",
+      "title": "Source freshness",
+      "pass_criteria": "After file edit without reindex, evidence-based read/snippets return CONTENT_CHANGED rather than stale offsets.",
+      "status": "PASS"
+    },
+    {
+      "id": "P27",
+      "phase": "10",
+      "title": "Stable pagination",
+      "pass_criteria": "Cursors bind to repository, generation and query; stale/tampered/foreign cursors fail clearly.",
+      "status": "PASS"
+    },
+    {
+      "id": "P28",
+      "phase": "10",
+      "title": "Frame byte budget",
+      "pass_criteria": "Whole serialized MCP result, including text fallback, stays within 65536 bytes and is valid JSON.",
+      "status": "PASS"
+    },
+    {
+      "id": "P29",
+      "phase": "11",
+      "title": "Schemas and errors",
+      "pass_criteria": "Tool annotations and schemas match actual mutation/read behavior; execution errors differ from protocol errors.",
+      "status": "PASS"
+    },
+    {
+      "id": "P30",
+      "phase": "11",
+      "title": "No fake tools",
+      "pass_criteria": "Only implemented tools are advertised; no empty-success placeholders or invented standardized Tasks support.",
+      "status": "PASS"
+    },
+    {
+      "id": "P31",
+      "phase": "12",
+      "title": "Watch reconciliation",
+      "pass_criteria": "Atomic saves, rename/delete, bursts and simulated missed notifications reconcile to correct hashes and paths.",
+      "status": "PASS"
+    },
+    {
+      "id": "P32",
+      "phase": "12",
+      "title": "Ignore changes",
+      "pass_criteria": "Ignore/policy changes remove newly excluded files atomically; notify overflows trigger bounded reconciliation.",
+      "status": "PASS"
+    },
+    {
+      "id": "P33",
+      "phase": "13",
+      "title": "Memory privileges",
+      "pass_criteria": "Repository config cannot enable privileged writes; opt-in memory writes enforce revision/evidence validation.",
+      "status": "PASS"
+    },
+    {
+      "id": "P34",
+      "phase": "13",
+      "title": "Memory preservation",
+      "pass_criteria": "Reindex/GC/rebuild preserve explicit memories; evidence hashes mark stale notes; forget is explicit and scoped.",
+      "status": "PASS"
+    },
+    {
+      "id": "P35",
+      "phase": "13",
+      "title": "Resource parity",
+      "pass_criteria": "Resources enforce the same root, secrecy, source freshness and byte limits as tools.",
+      "status": "PASS"
+    },
+    {
+      "id": "P36",
+      "phase": "14",
+      "title": "No automatic execution",
+      "pass_criteria": "Indexing executes no repository code/hooks/restores, downloads no grammar/model and opens no network listener.",
+      "status": "PASS"
+    },
+    {
+      "id": "P37",
+      "phase": "14",
+      "title": "Injection content",
+      "pass_criteria": "Source comments/memories requesting secret upload are returned only as untrusted data; never interpreted server-side.",
+      "status": "PASS"
+    },
+    {
+      "id": "P38",
+      "phase": "14",
+      "title": "Platform evidence",
+      "pass_criteria": "Run native tests on macOS ARM64, Windows x64 and Linux x64 or mark unavailable targets NOT_TESTED.",
+      "status": "PARTIAL"
+    },
+    {
+      "id": "P39",
+      "phase": "14",
+      "title": "Measured performance",
+      "pass_criteria": "Publish reproducible corpus/commit/hardware/raw samples and correctness coverage; no invented speed claims.",
+      "status": "PASS"
+    },
+    {
+      "id": "P40",
+      "phase": "15",
+      "title": "Safe Codex config",
+      "pass_criteria": "Dry-run is side-effect-free; apply backs up and preserves comments/other MCP entries; required=false; rollback/removal scoped.",
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "id": "P41",
+      "phase": "15",
+      "title": "WAL-aware backup",
+      "pass_criteria": "Doctor/rebuild/backup handles SQLite through a safe API/checkpoint strategy, never copying a live main DB alone.",
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "id": "P42",
+      "phase": "16",
+      "title": "Optional framework precision",
+      "pass_criteria": "Route/widget/annotation relationships carry syntactic evidence and candidates; no build evaluation or framework runtime.",
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "id": "P43",
+      "phase": "17",
+      "title": "Opt-in LSP",
+      "pass_criteria": "Only approved local sidecars start; document-version-aware semantic facts do not block base seven-language indexing.",
+      "status": "NOT_EXECUTED"
+    }
+  ]
+}

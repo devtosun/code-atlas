@@ -1,0 +1,8 @@
+# MERGE only this table into your existing configuration after backup/review.
+# Replace both absolute paths after the application has been built and smoke-tested.
+[mcp_servers.codeatlas]
+command = "/absolute/path/to/codeatlas"
+args = ["serve", "--root", "/absolute/path/to/project"]
+required = false
+startup_timeout_sec = 10
+tool_timeout_sec = 60

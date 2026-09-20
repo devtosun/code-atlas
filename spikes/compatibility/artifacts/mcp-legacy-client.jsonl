@@ -1,0 +1,4 @@
+{"id":1,"jsonrpc":"2.0","method":"initialize","params":{"capabilities":{},"clientInfo":{"name":"codeatlas-compatibility-client","version":"0.1.0"},"protocolVersion":"2025-11-25"}}
+{"jsonrpc":"2.0","method":"notifications/initialized"}
+{"id":2,"jsonrpc":"2.0","method":"tools/list","params":{}}
+{"id":3,"jsonrpc":"2.0","method":"tools/call","params":{"arguments":{},"name":"compatibility_status"}}

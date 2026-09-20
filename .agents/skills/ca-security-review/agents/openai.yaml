@@ -1,0 +1,6 @@
+interface:
+  display_name: "Security Review"
+  short_description: "CodeAtlas: security review"
+  default_prompt: "Use $ca-security-review to carry out the requested CodeAtlas phase within its acceptance gates."
+policy:
+  allow_implicit_invocation: true

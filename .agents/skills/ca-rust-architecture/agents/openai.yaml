@@ -1,0 +1,6 @@
+interface:
+  display_name: "Rust Architecture"
+  short_description: "CodeAtlas: rust architecture"
+  default_prompt: "Use $ca-rust-architecture to carry out the requested CodeAtlas phase within its acceptance gates."
+policy:
+  allow_implicit_invocation: true

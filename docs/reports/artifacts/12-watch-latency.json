@@ -1,0 +1,10 @@
+{
+  "backend": "polling",
+  "debounce_ms": 50,
+  "edit_sequence": "atomic-save-rename-delete-recreate-case-rename-unicode-ignore-burst-git-head",
+  "files": 10,
+  "latency_ms": 1137.715625,
+  "reconcile_interval_ms": 1000,
+  "measurement_scope": "single debug-build fixture run on macOS arm64; not a p95 benchmark",
+  "native_event_latency": "not claimed; FSEvents initialized but no callback was observed in the short managed test"
+}

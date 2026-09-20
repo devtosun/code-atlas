@@ -1,0 +1,6 @@
+interface:
+  display_name: "Graph and Retrieval"
+  short_description: "CodeAtlas: graph and retrieval"
+  default_prompt: "Use $ca-graph-resolution to carry out the requested CodeAtlas phase within its acceptance gates."
+policy:
+  allow_implicit_invocation: true

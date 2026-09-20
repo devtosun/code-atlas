@@ -1,0 +1,543 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-09-20",
+  "phase": "14-hardening-and-evaluation",
+  "toolchain": {
+    "rust": "1.98.1",
+    "rust_commit": "48a229ceaefd4985c50990b14116b6d856af0985",
+    "cargo": "1.98.1",
+    "cargo_commit": "797e8a9bca276c1c9f9f738d2a20f484fa4eea9d",
+    "llvm": "22.1.8",
+    "target": "aarch64-apple-darwin"
+  },
+  "host": {
+    "os": "macOS 27.0 (26A428)",
+    "architecture": "arm64",
+    "native_compiler": "Apple clang 17.0.0"
+  },
+  "tree_sitter_runtime": {
+    "package": "tree-sitter",
+    "version": "0.27.0",
+    "crate_checksum_sha256": "2038684e0058edba0d17302619f62eabce4a8e11c6ac59506996a8d79848851d",
+    "source": "https://github.com/tree-sitter/tree-sitter",
+    "source_commit": "6070dbfefd326bd735e5683eb128cc1b57dad0c0",
+    "license": "MIT",
+    "minimum_grammar_abi": 13,
+    "maximum_grammar_abi": 15
+  },
+  "grammars": [
+    {
+      "targets": ["Dart"],
+      "package": "tree-sitter-dart",
+      "version": "0.2.0",
+      "crate_checksum_sha256": "325dd1e24ee9ee21111e9c43680ae7d6010aaa9f282b048a99b9c7163c1cf553",
+      "source": "https://github.com/nielsenko/tree-sitter-dart",
+      "source_commit": "b57d734c84f510bbd524097902cab671e4dbfca9",
+      "license": "MIT",
+      "abi": 15,
+      "basic_parse": "pass",
+      "query": "pass",
+      "modern_fixture": "pass"
+    },
+    {
+      "targets": ["C#"],
+      "package": "tree-sitter-c-sharp",
+      "version": "0.23.5",
+      "crate_checksum_sha256": "c1aac67f1ad71de1d6d39708d34811081c26dfa495658de6c14c34200849357c",
+      "source": "https://github.com/tree-sitter/tree-sitter-c-sharp",
+      "source_commit": "cac6d5fb595f5811a076336682d5d595ac1c9e85",
+      "license": "MIT",
+      "abi": 15,
+      "basic_parse": "pass",
+      "query": "pass"
+    },
+    {
+      "targets": ["Rust"],
+      "package": "tree-sitter-rust",
+      "version": "0.24.2",
+      "crate_checksum_sha256": "439e577dbe07423ec2582ac62c7531120dbfccfa6e5f92406f93dd271a120e45",
+      "source": "https://github.com/tree-sitter/tree-sitter-rust",
+      "source_commit": "e2bee853694a1d3e0f6ef308fe3674542fec95d7",
+      "license": "MIT",
+      "abi": 15,
+      "basic_parse": "pass",
+      "query": "pass"
+    },
+    {
+      "targets": ["Go"],
+      "package": "tree-sitter-go",
+      "version": "0.25.0",
+      "crate_checksum_sha256": "c8560a4d2f835cc0d4d2c2e03cbd0dde2f6114b43bc491164238d333e28b16ea",
+      "source": "https://github.com/tree-sitter/tree-sitter-go",
+      "source_commit": "1547678a9da59885853f5f5cc8a99cc203fa2e2c",
+      "license": "MIT",
+      "abi": 15,
+      "basic_parse": "pass",
+      "query": "pass"
+    },
+    {
+      "targets": ["Java"],
+      "package": "tree-sitter-java",
+      "version": "0.23.5",
+      "crate_checksum_sha256": "0aa6cbcdc8c679b214e616fd3300da67da0e492e066df01bcf5a5921a71e90d6",
+      "source": "https://github.com/tree-sitter/tree-sitter-java",
+      "source_commit": "94703d5a6bed02b98e438d7cad1136c01a60ba2c",
+      "license": "MIT",
+      "abi": 14,
+      "basic_parse": "pass",
+      "query": "pass"
+    },
+    {
+      "targets": ["JavaScript", "JSX"],
+      "package": "tree-sitter-javascript",
+      "version": "0.25.0",
+      "crate_checksum_sha256": "68204f2abc0627a90bdf06e605f5c470aa26fdcb2081ea553a04bdad756693f5",
+      "source": "https://github.com/tree-sitter/tree-sitter-javascript",
+      "source_commit": "44c892e0be055ac465d5eeddae6d3e194424e7de",
+      "license": "MIT",
+      "abi": 15,
+      "basic_parse": "pass",
+      "query": "pass"
+    },
+    {
+      "targets": ["TypeScript", "TSX"],
+      "package": "tree-sitter-typescript",
+      "version": "0.23.2",
+      "crate_checksum_sha256": "6c5f76ed8d947a75cc446d5fccd8b602ebf0cde64ccf2ffa434d873d7a575eff",
+      "source": "https://github.com/tree-sitter/tree-sitter-typescript",
+      "source_commit": "f975a621f4e7f532fe322e13c4f79495e0a7b2e7",
+      "license": "MIT",
+      "abi": 14,
+      "basic_parse": "pass",
+      "query": "pass"
+    }
+  ],
+  "query_sha256": {
+    "c_sharp.scm": "1020d9d5373443b082bdcfbcaa196164126c3729b1750d9859ea3445a08d7589",
+    "dart.scm": "1020d9d5373443b082bdcfbcaa196164126c3729b1750d9859ea3445a08d7589",
+    "go.scm": "1020d9d5373443b082bdcfbcaa196164126c3729b1750d9859ea3445a08d7589",
+    "java.scm": "1020d9d5373443b082bdcfbcaa196164126c3729b1750d9859ea3445a08d7589",
+    "javascript.scm": "1020d9d5373443b082bdcfbcaa196164126c3729b1750d9859ea3445a08d7589",
+    "jsx.scm": "7ab9e476acd9d4ce8d952d0fd96cae0cf4c1620d7fec776b77ad4a6311af3b99",
+    "rust.scm": "1020d9d5373443b082bdcfbcaa196164126c3729b1750d9859ea3445a08d7589",
+    "tsx.scm": "9c215d56224fd1143ac1974422a07a81d5ac829f18521861c7457200135eb26b",
+    "typescript.scm": "2a60197e086f07c8ff908c99d000761ecb505e74d4961af61aecc08763d25d85"
+  },
+  "mcp": {
+    "package": "rmcp",
+    "version": "3.4.0",
+    "crate_checksum_sha256": "b23c62fe489ac1d401ab32688cfacac3737a8978dc3343e5361464c7724fd3cb",
+    "source": "https://github.com/modelcontextprotocol/rust-sdk",
+    "source_commit": "fd7811fdaa9fefa1c8034534b4d7a31c97204f89",
+    "license": "Apache-2.0",
+    "features": ["server", "transport-io"],
+    "protocols": {
+      "2026-07-28": "server/discover and per-request metadata pass",
+      "2025-11-25": "initialize/initialized lifecycle pass"
+    },
+    "installed_codex": "codex-cli 0.154.0"
+  },
+  "sqlite": {
+    "adapter_package": "rusqlite",
+    "adapter_version": "0.40.2",
+    "adapter_checksum_sha256": "23f2a97da3e3873c73cb2a2e71b35c40ff95e0b1eefa8d72d8499a6928c3b5b3",
+    "features": ["bundled-full"],
+    "runtime_version": "3.53.2",
+    "policy_floor": "3.51.3",
+    "fts5_transaction": "pass",
+    "compile_options": [
+      "ATOMIC_INTRINSICS=1",
+      "COMPILER=clang-17.0.0",
+      "DEFAULT_AUTOVACUUM",
+      "DEFAULT_CACHE_SIZE=-2000",
+      "DEFAULT_FILE_FORMAT=4",
+      "DEFAULT_FOREIGN_KEYS",
+      "DEFAULT_JOURNAL_SIZE_LIMIT=-1",
+      "DEFAULT_MMAP_SIZE=0",
+      "DEFAULT_PAGE_SIZE=4096",
+      "DEFAULT_PCACHE_INITSZ=20",
+      "DEFAULT_RECURSIVE_TRIGGERS",
+      "DEFAULT_SECTOR_SIZE=4096",
+      "DEFAULT_SYNCHRONOUS=2",
+      "DEFAULT_WAL_AUTOCHECKPOINT=1000",
+      "DEFAULT_WAL_SYNCHRONOUS=2",
+      "DEFAULT_WORKER_THREADS=0",
+      "DIRECT_OVERFLOW_READ",
+      "ENABLE_API_ARMOR",
+      "ENABLE_COLUMN_METADATA",
+      "ENABLE_DBSTAT_VTAB",
+      "ENABLE_FTS3",
+      "ENABLE_FTS3_PARENTHESIS",
+      "ENABLE_FTS5",
+      "ENABLE_LOAD_EXTENSION",
+      "ENABLE_MEMORY_MANAGEMENT",
+      "ENABLE_RTREE",
+      "ENABLE_STAT4",
+      "ENABLE_UNLOCK_NOTIFY",
+      "HAVE_ISNAN",
+      "MALLOC_SOFT_LIMIT=1024",
+      "MAX_ATTACHED=10",
+      "MAX_COLUMN=2000",
+      "MAX_COMPOUND_SELECT=500",
+      "MAX_DEFAULT_PAGE_SIZE=8192",
+      "MAX_EXPR_DEPTH=1000",
+      "MAX_FUNCTION_ARG=1000",
+      "MAX_LENGTH=1000000000",
+      "MAX_LIKE_PATTERN_LENGTH=50000",
+      "MAX_MMAP_SIZE=0x7fff0000",
+      "MAX_PAGE_COUNT=0xfffffffe",
+      "MAX_PAGE_SIZE=65536",
+      "MAX_SQL_LENGTH=1000000000",
+      "MAX_TRIGGER_DEPTH=1000",
+      "MAX_VARIABLE_NUMBER=32766",
+      "MAX_VDBE_OP=250000000",
+      "MAX_WORKER_THREADS=8",
+      "MUTEX_PTHREADS",
+      "SOUNDEX",
+      "SYSTEM_MALLOC",
+      "TEMP_STORE=1",
+      "THREADSAFE=1",
+      "USE_URI"
+    ]
+  },
+  "production_phase_02": {
+    "packages": [
+      {
+        "package": "blake3",
+        "version": "1.8.7",
+        "crate_checksum_sha256": "6d9e454fc11f76977dc803893aff6304ed33d6a26efae8696573bea74baa27ae",
+        "license": "CC0-1.0 OR Apache-2.0 OR Apache-2.0 WITH LLVM-exception",
+        "purpose": "worktree and immutable source fingerprints; not authentication"
+      },
+      {
+        "package": "fs4",
+        "version": "1.1.0",
+        "crate_checksum_sha256": "7e72ed92b67c146290f88e9c89d60ca163ea417a446f61ffd7b72df3e7f1dfd5",
+        "license": "MIT OR Apache-2.0",
+        "features": [],
+        "purpose": "nonblocking cross-platform OS write-owner lock"
+      },
+      {
+        "package": "gix",
+        "version": "0.87.1",
+        "crate_checksum_sha256": "fdefc1465d8631807deaf504dacdeff628b978de515653b47976ca7c28ab2a7a",
+        "license": "MIT OR Apache-2.0",
+        "default_features": false,
+        "features": ["sha1"],
+        "purpose": "isolated read-only worktree metadata"
+      },
+      {
+        "package": "ignore",
+        "version": "0.4.33",
+        "crate_checksum_sha256": "00b69833ed729dc5aa7d19541d96d6cf8e9137194207a04916d658e43168402f",
+        "license": "Unlicense OR MIT",
+        "purpose": "gitignore-compatible matching without directory walking"
+      },
+      {
+        "package": "libc",
+        "version": "0.2.189",
+        "crate_checksum_sha256": "3eaf3ede3fee6db1a4c2ee091bf8a8b4dccdc6d17f656fb07896ee72867612f2",
+        "license": "MIT OR Apache-2.0",
+        "target": "cfg(unix)",
+        "purpose": "O_NOFOLLOW and O_CLOEXEC source/lock opens"
+      },
+      {
+        "package": "rusqlite",
+        "version": "0.40.2",
+        "crate_checksum_sha256": "23f2a97da3e3873c73cb2a2e71b35c40ff95e0b1eefa8d72d8499a6928c3b5b3",
+        "license": "MIT",
+        "default_features": false,
+        "features": ["bundled-full"],
+        "runtime_version": "3.53.2",
+        "purpose": "SQLite/FTS5/WAL generations and backup API"
+      }
+    ],
+    "native_macos_arm64": "path, lock, migration, FTS, backup and generation tests pass",
+    "native_linux_x64": "not run",
+    "native_windows_x64_msvc": "not run"
+  },
+  "production_phase_03": {
+    "tree_sitter_runtime": "0.27.0",
+    "fingerprint_definition": "BLAKE3 over pinned package name, version, grammar ABI and embedded node-types metadata; query fingerprint over ordered embedded query names and bytes",
+    "capability": "parser_ready=true; extractor_ready=false for every provider",
+    "providers": [
+      {
+        "target": "dart",
+        "grammar_fingerprint_blake3": "8191ecba8dadb79b8964a89b933a791f9cd145a7ea69067b5821ab3b4e96cf7c",
+        "query_fingerprint_blake3": "c1f40568d8dcd0eb2f04818926a304d4711bfede423add01312d112c2ca194d4"
+      },
+      {
+        "target": "csharp",
+        "grammar_fingerprint_blake3": "3caf8144700ba84ddd8373c38738c2d99cccf13b870128ff542cdcd96afce6ae",
+        "query_fingerprint_blake3": "213f53c8f00b2b23c5b49eb31e6ed39d7489e10696b5a5a4675b047ffa943a59"
+      },
+      {
+        "target": "rust",
+        "grammar_fingerprint_blake3": "f277942e769529322adb0642885ce38ff602086df5505235cc57137e6da7a1d9",
+        "query_fingerprint_blake3": "7f8fa28dbf3a923fecd4e3496974f39678104a4da708ac3190ad4d4674636f07"
+      },
+      {
+        "target": "go",
+        "grammar_fingerprint_blake3": "9aa217ba1368f04dc987c0fadc38e6089780194e9c1c9d33aa71feade0f81d69",
+        "query_fingerprint_blake3": "ed47f0ac421379bffedf477388730563ac1421bf8a0f88cabf65e836f73e9ccf"
+      },
+      {
+        "target": "java",
+        "grammar_fingerprint_blake3": "64b0011328ca495c339b6aed9ccf0e61e98cd1c6cf0876d089b419fb5a552658",
+        "query_fingerprint_blake3": "89a5c3ac23e768b300503d82ba7a1cf9e2073f00d8483b18f350a2fab0d2e519"
+      },
+      {
+        "target": "javascript",
+        "grammar_fingerprint_blake3": "2cc3b1bfeba672df1b893b883a4ac17100adb646640ef317c24b41d85bdc0d87",
+        "query_fingerprint_blake3": "fe37b66b2a6b689f89738f71dd14c6913b6302aa9ae3fc55bb42dca2bb0aa5ed"
+      },
+      {
+        "target": "jsx",
+        "grammar_fingerprint_blake3": "2cc3b1bfeba672df1b893b883a4ac17100adb646640ef317c24b41d85bdc0d87",
+        "query_fingerprint_blake3": "69283213795de283482437a496f1fdd46e29c4acde81bfe60417b08a5673278e"
+      },
+      {
+        "target": "typescript",
+        "grammar_fingerprint_blake3": "d54a737a9d7f044492df6f94bead3636c0f4bc2962d355ef5d8804f4b98e7c8e",
+        "query_fingerprint_blake3": "f73dcbf202059aa94ba9ee7c958125f734b73e4d2d04f5e3ce8c0e780eeef7f6"
+      },
+      {
+        "target": "tsx",
+        "grammar_fingerprint_blake3": "e40877b8a4e92f94935246374d075b4003eeaf6b6dd7dc969a14aedb2432f5d6",
+        "query_fingerprint_blake3": "08e94f5fb5278082e9ae57c7dce3b426ba33d9a9021ea0cc202b1d48a10e0491"
+      }
+    ],
+    "native_macos_arm64": "all providers, bounds, cancellation/reset and 24 fixture entries pass",
+    "native_linux_x64": "not run",
+    "native_windows_x64_msvc": "not run"
+  },
+  "production_phase_04": {
+    "fingerprint_definition": "extractor BLAKE3 over ordered query fingerprint, a zero separator and the language adapter version",
+    "capability": "Rust and Go parser/extractor/declaration/scope/import/reference/call readiness=true and name_resolution_ready=false; other providers retain Phase 03 capability flags",
+    "adapters": [
+      {
+        "target": "rust",
+        "adapter_version": "rust-source-v1",
+        "grammar_fingerprint_blake3": "f277942e769529322adb0642885ce38ff602086df5505235cc57137e6da7a1d9",
+        "query_fingerprint_blake3": "93d2eb1fb4f9e587bd8d531c219283760d336763cbb3ada9e4b99e456a001c35",
+        "extractor_fingerprint_blake3": "865b70d6275b6a84bb61776b6c16e705fde8852b4b257d3c8e40d9f969ab3c03"
+      },
+      {
+        "target": "go",
+        "adapter_version": "go-source-v1",
+        "grammar_fingerprint_blake3": "9aa217ba1368f04dc987c0fadc38e6089780194e9c1c9d33aa71feade0f81d69",
+        "query_fingerprint_blake3": "d445256bc65be5f368651f2d4a1feb88a3c5e3f5ec5569b3434b5956e9203e5d",
+        "extractor_fingerprint_blake3": "77edbd9700dd42a972bf57c09b05d452d2e99aeec6640db177824427a75b395c"
+      }
+    ],
+    "native_macos_arm64": "Rust/Go source extraction fixtures, stable IDs, scope ownership, limits and cancellation pass",
+    "native_linux_x64": "not run",
+    "native_windows_x64_msvc": "not run"
+  },
+  "production_phase_05": {
+    "fingerprint_definition": "extractor BLAKE3 over ordered query fingerprint, a zero separator and the ECMAScript-family adapter version",
+    "capability": "JavaScript, JSX, TypeScript and TSX parser/extractor/declaration/scope/import/reference/call readiness=true and name_resolution_ready=false; TypeScript and TSX retain distinct grammar fingerprints",
+    "adapters": [
+      {
+        "target": "javascript",
+        "adapter_version": "javascript-source-v1",
+        "grammar_fingerprint_blake3": "2cc3b1bfeba672df1b893b883a4ac17100adb646640ef317c24b41d85bdc0d87",
+        "query_fingerprint_blake3": "c076bf615c407d3cf721a3fd9338a8334e5f3d9af2622e4689b14fb3673c103e",
+        "extractor_fingerprint_blake3": "0009595fee74b75e658924893353d56ae10f99f7c9cf6e1afd8b0cfb437aabe2"
+      },
+      {
+        "target": "jsx",
+        "adapter_version": "javascript-source-v1",
+        "grammar_fingerprint_blake3": "2cc3b1bfeba672df1b893b883a4ac17100adb646640ef317c24b41d85bdc0d87",
+        "query_fingerprint_blake3": "89fc5f9a8c0ca7bb6471847ad2a5e4bf87cf2c146d4910cdb6366494b7d02fff",
+        "extractor_fingerprint_blake3": "1ec8a2320ee127feace3724a36c51486fce2975329ff9e3966937cacfd6dc5ac"
+      },
+      {
+        "target": "typescript",
+        "adapter_version": "typescript-source-v1",
+        "grammar_fingerprint_blake3": "d54a737a9d7f044492df6f94bead3636c0f4bc2962d355ef5d8804f4b98e7c8e",
+        "query_fingerprint_blake3": "e0dac24903d2847e85b7ab848d14ef3812384cc13f3b178dbfab539a477e36c0",
+        "extractor_fingerprint_blake3": "880ed6928edddfef64955c7160fffeb7f8c6989902d93d690ae59c0a67211d48"
+      },
+      {
+        "target": "tsx",
+        "adapter_version": "typescript-source-v1",
+        "grammar_fingerprint_blake3": "e40877b8a4e92f94935246374d075b4003eeaf6b6dd7dc969a14aedb2432f5d6",
+        "query_fingerprint_blake3": "d8b026a6c1366c2a0f62c5877bd0182e7e73c8ad24ec52ac40a155c2699a61f0",
+        "extractor_fingerprint_blake3": "c4440e84b5f84764c8f9dfb42dfc7a0ecb91a1e11ada3aa1aa4d73998b16b3ec"
+      }
+    ],
+    "native_macos_arm64": "JavaScript/JSX/TypeScript/TSX source extraction fixtures, dialect routing, role separation, uncertainty labels, limits and cancellation pass",
+    "native_linux_x64": "not run",
+    "native_windows_x64_msvc": "not run"
+  },
+  "production_phase_06": {
+    "fingerprint_definition": "extractor BLAKE3 over ordered query fingerprint, a zero separator and the language adapter version",
+    "capability": "C# and Java parser/extractor/declaration/scope/import/reference/call readiness=true and name_resolution_ready=false; partial, overload and dispatch evidence remains syntax-only",
+    "adapters": [
+      {
+        "target": "csharp",
+        "adapter_version": "csharp-source-v1",
+        "grammar_fingerprint_blake3": "3caf8144700ba84ddd8373c38738c2d99cccf13b870128ff542cdcd96afce6ae",
+        "query_fingerprint_blake3": "b20cc363dd724f72ca29d2fc9ad524ac78faf80adf0cb84332d475153a47b7b7",
+        "extractor_fingerprint_blake3": "63965558f4a9f08211a54bb9fd1e4f1ab9f10cd8a7d6d26df2ec456846f5af79"
+      },
+      {
+        "target": "java",
+        "adapter_version": "java-source-v1",
+        "grammar_fingerprint_blake3": "64b0011328ca495c339b6aed9ccf0e61e98cd1c6cf0876d089b419fb5a552658",
+        "query_fingerprint_blake3": "04b31766ff2cbba3a51b4a4a956e9b5a47164e3cce03fcd824740f2f2ad58889",
+        "extractor_fingerprint_blake3": "9207a9c2e38d4b5214e61a86d4c5d539b6136d9b86b8089bd4ccb2b02bf5dbe6"
+      }
+    ],
+    "native_macos_arm64": "C#/Java source extraction fixtures, partial identity, overloads, nested types, unresolved dispatch, malformed recovery, Unicode/CRLF, limits and cancellation pass",
+    "native_linux_x64": "not run",
+    "native_windows_x64_msvc": "not run"
+  },
+  "production_phase_07": {
+    "fingerprint_definition": "extractor BLAKE3 over ordered query fingerprint, a zero separator and the Dart adapter version",
+    "capability": "Dart parser/extractor/declaration/scope/import/reference/call readiness=true and name_resolution_ready=false; analyzer, package, part, constructor and Flutter semantics remain unresolved",
+    "adapters": [
+      {
+        "target": "dart",
+        "adapter_version": "dart-source-v1",
+        "grammar_fingerprint_blake3": "8191ecba8dadb79b8964a89b933a791f9cd145a7ea69067b5821ab3b4e96cf7c",
+        "query_fingerprint_blake3": "35d474ab9bf441c95cbd92962b462832310f90f8f09e9c81fbded72854f547cd",
+        "extractor_fingerprint_blake3": "db8d093a22450cffb5032a9472aaf795c0f4d0aaf04f9baef3f29e745bd405d1"
+      }
+    ],
+    "grammar_limitations": [
+      "tree-sitter-dart 0.2.0 reports ERROR nodes for non-ASCII identifiers; UTF-8 bytes in comments and strings still retain exact source positions"
+    ],
+    "native_macos_arm64": "Dart source extraction fixtures, modern syntax, Flutter-style syntax-only observations, malformed recovery, Unicode/CRLF byte positions, limits and cancellation pass",
+    "native_linux_x64": "not run",
+    "native_windows_x64_msvc": "not run"
+  },
+  "production_phase_08": {
+    "schema_version": 3,
+    "new_third_party_dependencies": [],
+    "capability": "bounded scan/read-hash/parse/persist pipeline, exact fingerprint reuse, atomic generation activation and durable cancellable index jobs",
+    "reuse_fingerprint_fields": [
+      "content",
+      "configuration",
+      "grammar",
+      "query",
+      "extractor"
+    ],
+    "native_macos_arm64": "persistent indexing, all required language seeds, incremental reuse, cancellation, lock contention and killed-writer recovery pass",
+    "native_linux_x64": "not run",
+    "native_windows_x64_msvc": "not run"
+  },
+  "production_phase_09": {
+    "schema_version": 4,
+    "resolver_version": "codeatlas-resolver-v1",
+    "new_third_party_dependencies": [],
+    "capability": "bounded lexical scope and supported import/re-export resolution with generation-scoped evidence edges, explicit candidates/unresolved observations and bounded graph read ports",
+    "supported_manifest_data": [
+      "root go.mod module declaration",
+      "root pubspec.yaml package name"
+    ],
+    "evaluation_artifact": "docs/reports/artifacts/09-resolution-evaluation.json",
+    "native_macos_arm64": "35 independently labelled sites, graph generation membership, candidate opt-in, cycle/limit handling and incremental/full equivalence pass",
+    "native_linux_x64": "not run",
+    "native_windows_x64_msvc": "not run"
+  },
+  "production_phase_10": {
+    "schema_version": 4,
+    "new_third_party_dependencies": [],
+    "index_config_fingerprint": "codeatlas-default-index-config-v2-search-tokens",
+    "capability": "generation-bound ranked symbol search, rich bounded graph queries, source-freshness validation and deterministic byte-budgeted context assembly",
+    "response_budget_accounting": "exact UTF-8 bytes for structuredContent plus JSON TextContent fallback projection",
+    "token_estimate_method": "ceil(UTF-8 JSON bytes / 4)",
+    "native_macos_arm64": "literal-safe FTS, cursor binding, graph cycles/fanout, candidate disclosure, stale/deleted/excluded source handling, overlap deduplication and escaped-output caps pass",
+    "native_linux_x64": "not run",
+    "native_windows_x64_msvc": "not run"
+  },
+  "production_phase_11": {
+    "schema_version": 4,
+    "new_third_party_dependencies": [],
+    "mcp_sdk": "rmcp 3.4.0",
+    "protocol_versions": [
+      "2026-07-28",
+      "2025-11-25"
+    ],
+    "advertised_tools": 13,
+    "capability": "typed status, detached application index jobs, retrieval, graph, source and context tools with structured errors and complete response caps",
+    "installed_codex_cli": "0.154.0",
+    "actual_codex_mcp_session": "not run",
+    "native_macos_arm64": "all thirteen tools pass through independent modern and legacy subprocess clients; schemas, errors, idempotency, contention, cancellation, stdout purity and EOF joining pass",
+    "native_linux_x64": "not run",
+    "native_windows_x64_msvc": "not run"
+  },
+  "production_phase_12": {
+    "schema_version": 4,
+    "new_direct_dependencies": [
+      {
+        "package": "notify",
+        "version": "8.2.0",
+        "checksum": "4d3d07927151ff8575b7087f245456e549fea62edf0ec4e565a5ee50c8402bc3",
+        "license": "CC0-1.0",
+        "source": "https://github.com/notify-rs/notify.git"
+      }
+    ],
+    "capability": "opt-in owner-only native/poll watching with bounded hint queue, debounce, visible overflow and periodic scan/hash reconciliation",
+    "default_watch": false,
+    "default_auto_index": false,
+    "native_macos_arm64": "FSEvents backend initializes; explicit PollWatcher and periodic reconciliation converge with full rebuild across the edit corpus; native callback latency not observed in the managed short-burst test",
+    "native_linux_x64": "not run",
+    "native_windows_x64_msvc": "not run"
+  },
+  "production_phase_13": {
+    "schema_version": 5,
+    "new_third_party_dependencies": [],
+    "mcp_sdk": "rmcp 3.4.0",
+    "protocol_versions": [
+      "2026-07-28",
+      "2025-11-25"
+    ],
+    "advertised_tools_default": 14,
+    "advertised_tools_memory_write": 16,
+    "resources": 4,
+    "prompts": 3,
+    "memory_limits": {
+      "text_bytes": 16384,
+      "records_per_repository": 10000,
+      "evidence_per_record": 32,
+      "evidence_bytes_per_record": 8192,
+      "search_results": 100
+    },
+    "capability": "revisioned explicit project notes with exact evidence freshness, trusted mutation opt-in, typed repository resources and static client prompt templates",
+    "native_macos_arm64": "schema-v5 migration/storage tests and independent modern/legacy stdio clients pass all memory, resource, prompt, retention, policy and injection-as-data cases",
+    "native_linux_x64": "not run",
+    "native_windows_x64_msvc": "not run"
+  },
+  "production_phase_14": {
+    "schema_version": 6,
+    "new_production_third_party_dependencies": [],
+    "fuzz_only_dependency": {
+      "package": "libfuzzer-sys",
+      "version": "0.4.10",
+      "status": "locked separately under fuzz/; all three targets built and completed five-minute isolated macOS runs with no crashes or timeouts"
+    },
+    "artifacts": [
+      "docs/reports/artifacts/14-performance-baseline.json",
+      "docs/reports/artifacts/14-accuracy-evaluation.json",
+      "docs/reports/artifacts/14-dependency-inventory.json",
+      "docs/reports/artifacts/14-fuzz-results.json",
+      "docs/reports/artifacts/14-process-capabilities.json"
+    ],
+    "release_binary_sha256": "ec90f1123317a56c3a054745c0f27b08b4240cb7c632742ceb02249640ff751e",
+    "release_binary_bytes": 24791408,
+    "release_symbols": "stripped by Cargo release profile",
+    "bundled_sqlite": "3.53.2 with FTS5; schema v6",
+    "native_macos_arm64": "supported: workspace, adversarial dual-era lifecycle, crash/migration/property, fuzz, advisory/license policy, exhaustive accuracy and repaired 10k/100k measurements pass",
+    "release_status": "Phase 14 complete for macOS ARM64; Phase 15 packaging/integration pending; Linux/Windows deferred and unsupported",
+    "native_linux_x64": "not run; unsupported until deferred native validation passes",
+    "native_windows_x64_msvc": "not run; unsupported until deferred native validation passes"
+  },
+  "native_platforms": {
+    "macos_arm64": "pass",
+    "linux_x64": "not run",
+    "windows_x64_msvc": "not run"
+  }
+}
