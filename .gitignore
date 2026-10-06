@@ -12,5 +12,6 @@
 .env.*
 .DS_Store
 /docs/reports/private/
+/dist/
 __pycache__/
 # Keep Cargo.lock under version control for this binary workspace.

@@ -421,6 +421,73 @@ mod tests {
     }
 
     #[test]
+    fn member_selectors_preserve_receivers_without_decorating_bare_names() {
+        let cases: &[(LanguageId, &[u8])] = &[
+            (LanguageId::Rust, b"struct S { value:i32 } fn read(obj:S){let value=9;let x=obj.value;let y=value;}"),
+            (LanguageId::Go, b"package p\ntype S struct{ Value int };func read(obj S){Value:=9; x:=obj.Value; _=x;_=Value}"),
+            (LanguageId::CSharp, b"class S {int value;void Read(S obj){int value=9;int x=obj.value;int y=value;}}"),
+            (LanguageId::Java, b"class S {int value;void read(S obj){int value=9;int x=obj.value;int y=value;}}"),
+            (LanguageId::Dart, b"class S {int value=1;void read(S obj){var value=9;var x=obj.value;var y=value;}}"),
+        ];
+        for &(language, source) in cases {
+            let result = parse(language, source);
+            assert!(!result.coverage.root_has_error, "{language:?}");
+            let selector = result
+                .references
+                .iter()
+                .find(|item| item.receiver_type.as_deref() == Some("obj"))
+                .expect("selected property receiver");
+            assert!(
+                selector
+                    .limitations
+                    .iter()
+                    .any(|item| item == "receiver_type_not_inferred")
+            );
+            assert!(
+                result
+                    .references
+                    .iter()
+                    .any(|item| item.spelling == selector.spelling
+                        && item.range.bytes.start() > selector.range.bytes.start()
+                        && item.receiver_type.is_none()),
+                "bare name stays lexical: {language:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn arrow_and_function_expression_exports_are_visible_in_all_ecma_dialects() {
+        for language in [
+            LanguageId::JavaScript,
+            LanguageId::Jsx,
+            LanguageId::TypeScript,
+            LanguageId::Tsx,
+        ] {
+            let result = parse(language, b"export const work=()=>1; export const other=function(){return 2}; const privateWork=()=>3;");
+            for name in ["work", "other"] {
+                assert!(
+                    result.declarations.iter().any(|item| item.spelling == name
+                        && item
+                            .attributes
+                            .iter()
+                            .any(|attribute| attribute == "exported")),
+                    "{language:?}: {name}"
+                );
+            }
+            assert!(
+                result
+                    .declarations
+                    .iter()
+                    .filter(|item| item.spelling == "privateWork")
+                    .all(|item| !item
+                        .attributes
+                        .iter()
+                        .any(|attribute| attribute == "exported"))
+            );
+        }
+    }
+
+    #[test]
     fn registry_loads_all_dialects_and_compiles_embedded_queries() {
         let records = LanguageRegistry::validate_all().expect("registry should validate");
         assert_eq!(records.len(), LanguageId::ALL.len());

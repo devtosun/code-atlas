@@ -16,7 +16,7 @@
 
     {"language":"java","source_path":"java/Invoice.java","source_category":"call_site","source_spelling":"twice","occurrence":0,"relationship":"calls","resolution":"candidate","candidate_count":1,"targets":[{"path":"java/Calculator.java","name":"twice"}]},
     {"language":"java","source_path":"java/Invoice.java","source_category":"call_site","source_spelling":"total","occurrence":0,"relationship":"calls","resolution":"candidate","candidate_count":2,"targets":[{"path":"java/Invoice.java","name":"total"},{"path":"java/Invoice.java","name":"total"}]},
-    {"language":"java","source_path":"java/Invoice.java","source_category":"reference","source_spelling":"amount","occurrence":0,"relationship":"references","resolution":"lexically_resolved","candidate_count":1,"targets":[{"path":"java/Invoice.java","name":"amount"}]},
+    {"language":"java","source_path":"java/Invoice.java","source_category":"reference","source_spelling":"amount","occurrence":0,"relationship":"references","resolution":"candidate","candidate_count":1,"targets":[{"path":"java/Invoice.java","name":"amount"}]},
     {"language":"java","source_path":"java/Advanced.java","source_category":"import","source_spelling":"java.util.List","occurrence":0,"relationship":"imports","resolution":"syntax_observation","candidate_count":1,"targets":[]},
     {"language":"java","source_path":"java/Advanced.java","source_category":"call_site","source_spelling":"save","occurrence":0,"relationship":"calls","resolution":"candidate","candidate_count":1,"targets":[{"path":"java/Advanced.java","name":"save"}]},
 

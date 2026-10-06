@@ -60,13 +60,13 @@ impl LanguageProvider {
     #[must_use]
     pub fn extractor_fingerprint(self) -> String {
         let extractor_version = match self.id {
-            LanguageId::Dart => "dart-source-v1",
-            LanguageId::CSharp => "csharp-source-v1",
-            LanguageId::Rust => "rust-source-v1",
-            LanguageId::Go => "go-source-v1",
-            LanguageId::Java => "java-source-v1",
-            LanguageId::JavaScript | LanguageId::Jsx => "javascript-source-v1",
-            LanguageId::TypeScript | LanguageId::Tsx => "typescript-source-v1",
+            LanguageId::Dart => "dart-source-v2",
+            LanguageId::CSharp => "csharp-source-v2",
+            LanguageId::Rust => "rust-source-v2",
+            LanguageId::Go => "go-source-v2",
+            LanguageId::Java => "java-source-v2",
+            LanguageId::JavaScript | LanguageId::Jsx => "javascript-source-v2",
+            LanguageId::TypeScript | LanguageId::Tsx => "typescript-source-v2",
         };
         let mut hasher = blake3::Hasher::new();
         hasher.update(self.query_fingerprint().as_bytes());

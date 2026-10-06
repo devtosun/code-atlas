@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "binary_sha256": "5148b860de01c893ec7a1afcfee515c0ade475f1a60d8d1045ea90f3316a77fe",
+  "elapsed_seconds": 2.5282292909687385,
+  "checks": [
+    {
+      "check": "CR-001 EOF-equal scopes terminate",
+      "passed": true
+    },
+    {
+      "check": "CR-002 invalid/binary/oversized preserve active; real delete works",
+      "passed": true
+    },
+    {
+      "check": "CR-003 five member selectors stay uncertain; bare names resolve",
+      "passed": true
+    },
+    {
+      "check": "CR-004 Go same-directory positive, other-directory negative",
+      "passed": true
+    },
+    {
+      "check": "CR-005 local use alias does not escape its scope",
+      "passed": true
+    },
+    {
+      "check": "CR-005 nearest nested alias shadows outer import only within block",
+      "passed": true
+    },
+    {
+      "check": "CR-009 import/export show/hide and prefix rules",
+      "passed": true
+    },
+    {
+      "check": "CR-010 four ECMAScript dialects: arrows, expressions, aliases, defaults",
+      "passed": true
+    },
+    {
+      "check": "CR-012 complete wire frame bounds in legacy and modern protocols",
+      "passed": true
+    },
+    {
+      "check": "CR-013 malformed private config never echoed, all modes unchanged",
+      "passed": true
+    }
+  ]
+}

@@ -2,7 +2,7 @@ use rusqlite::{Connection, OptionalExtension, Transaction};
 
 use crate::StorageError;
 
-pub const CURRENT_SCHEMA_VERSION: u32 = 6;
+pub const CURRENT_SCHEMA_VERSION: u32 = 7;
 pub(crate) const SQLITE_APPLICATION_ID: u32 = 0x4341_544c;
 
 const MIGRATION_1: &str = r#"
@@ -399,6 +399,16 @@ CREATE INDEX symbols_folded_spelling_idx
     ON symbols(lower(spelling));
 "#;
 
+// Preserve IDs, dependent rows and foreign keys; legacy versions are invalidated,
+// not rewritten. The renamed column retains the existing unique constraint.
+const MIGRATION_7: &str = r#"
+ALTER TABLE file_versions RENAME COLUMN extractor_hash TO analysis_key;
+ALTER TABLE file_versions ADD COLUMN extractor_hash TEXT NOT NULL DEFAULT '';
+UPDATE file_versions SET extractor_hash = analysis_key, analysis_key = 'legacy-v6:' || analysis_key;
+ALTER TABLE file_versions ADD COLUMN config_hash TEXT NOT NULL DEFAULT '';
+CREATE INDEX symbols_version_spelling_idx ON symbols(file_version_id, spelling);
+"#;
+
 pub(crate) fn migrate(connection: &mut Connection, root_id: &str) -> Result<(), StorageError> {
     migrate_to(connection, root_id, CURRENT_SCHEMA_VERSION)
 }
@@ -419,6 +429,7 @@ pub(crate) fn migrate_to(
             4 => apply_migration_4(&transaction)?,
             5 => apply_migration_5(&transaction)?,
             6 => apply_migration_6(&transaction)?,
+            7 => transaction.execute_batch(MIGRATION_7)?,
             _ => {
                 return Err(StorageError::FutureSchema {
                     found: next,

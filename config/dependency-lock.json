@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "generated_at": "2026-09-20",
-  "phase": "14-hardening-and-evaluation",
+  "phase": "15-release-and-codex",
   "toolchain": {
     "rust": "1.98.1",
     "rust_commit": "48a229ceaefd4985c50990b14116b6d856af0985",
@@ -534,6 +534,74 @@
     "release_status": "Phase 14 complete for macOS ARM64; Phase 15 packaging/integration pending; Linux/Windows deferred and unsupported",
     "native_linux_x64": "not run; unsupported until deferred native validation passes",
     "native_windows_x64_msvc": "not run; unsupported until deferred native validation passes"
+  },
+  "production_phase_15": {
+    "new_production_third_party_dependencies": [
+      {
+        "package": "toml_edit",
+        "version": "0.25.15+spec-1.1.0",
+        "crate_checksum_sha256": "1340ea94a5856333492c9064b02c778b191dd2c853778d9609debdcdfea3a614",
+        "license": "MIT OR Apache-2.0",
+        "purpose": "format-preserving, collision-safe Codex config integration"
+      }
+    ],
+    "release_binary_sha256": "45f11cecbadafc64456fd06ea36dcca9e140737d808f42ac56878afee6227b82",
+    "release_binary_bytes": 25013888,
+    "archive": "codeatlas-0.1.0-aarch64-apple-darwin.tar.gz",
+    "archive_sha256": "57e64086ba5fb066f0fd79f1a2aeda71080e7cb68e8a7c8a7ca023327485c427",
+    "archive_bytes": 5484074,
+    "dynamic_dependencies": [
+      "CoreFoundation.framework",
+      "CoreServices.framework",
+      "libiconv.2.dylib",
+      "libSystem.B.dylib"
+    ],
+    "installed_codex": "codex-cli 0.154.0; disposable config parse passed; model-backed session not run",
+    "native_macos_arm64": "supported: locked native package, deterministic rerun, extracted dual-era/index/follower/corrupt-startup/EOF/config smoke pass",
+    "release_status": "unsigned, not notarized and not publicly published",
+    "native_linux_x64": "not run; unsupported until deferred native validation passes",
+    "native_windows_x64_msvc": "not run; unsupported until deferred native validation passes"
+  },
+  "review_repairs": {
+    "recorded_at": "2026-10-06",
+    "report": "docs/reports/review-fixes.md",
+    "findings": "CR-001 through CR-013",
+    "storage_schema_version": 7,
+    "resolver_version": "codeatlas-resolver-v2",
+    "extractor_versions": "all nine language/dialect providers use source-v2",
+    "promoted_locked_direct_dependencies": [
+      {
+        "package": "futures",
+        "version": "0.3.34",
+        "crate_checksum_sha256": "9a31d2a3fbaaeb2af2368bbdd904aa8e812d3c04a1ee10d3171f52d556e5d0a3",
+        "license": "MIT OR Apache-2.0"
+      },
+      {
+        "package": "tokio-util",
+        "version": "0.7.19",
+        "crate_checksum_sha256": "494815d09bf52b5548659851081238f0ca39ff638363907596da739561c62c52",
+        "license": "MIT",
+        "features": ["codec", "rt"]
+      }
+    ],
+    "new_registry_package_versions": [],
+    "release_binary_sha256": "5148b860de01c893ec7a1afcfee515c0ade475f1a60d8d1045ea90f3316a77fe",
+    "release_binary_bytes": 25295168,
+    "archive": "dist/review-fixes-final/codeatlas-0.1.0-aarch64-apple-darwin.tar.gz",
+    "archive_sha256": "56e0b3d1d31a709c10f60384e27f9c5306ceeff9a90299315b36a219c9482103",
+    "archive_bytes": 5570958,
+    "artifacts": [
+      "docs/reports/artifacts/review-fixes-regressions.json",
+      "docs/reports/artifacts/review-fixes-boundaries.json",
+      "docs/reports/artifacts/review-fixes-performance.json",
+      "docs/reports/artifacts/review-fixes-package-smoke.json"
+    ],
+    "native_macos_arm64": "fresh locked workspace and fixture gates plus extracted package smoke pass; unsigned, not notarized or published",
+    "fresh_scale_performance": "1000-file sanity measurement only; old 10k/100k results are historical",
+    "fresh_fuzz_and_advisory_policy": "not run; cargo-fuzz/audit/deny not installed in isolated toolchain",
+    "installed_codex_parse_and_model_session": "not run in this repair turn; no real config mutation",
+    "native_linux_x64": "not run; deferred and unsupported",
+    "native_windows_x64_msvc": "not run; deferred and unsupported"
   },
   "native_platforms": {
     "macos_arm64": "pass",

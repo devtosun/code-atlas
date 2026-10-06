@@ -1,6 +1,18 @@
 # Security and privacy acceptance policy
 
 ## Trust boundaries
+
+Review-repair policies: rejected UTF-8, NUL/binary and oversized supported source
+make an index scan incomplete, preserving the healthy active generation. Exclusion
+and confirmed deletion remain separate. Field/member selectors retain receiver
+expressions and are candidates/unresolved without type inference, never bare-name
+bindings to shadowing locals. Generation history is active plus predecessor;
+long-lived readers may retain WAL pages and notes are independent of that GC.
+Malformed Codex TOML diagnostics expose only file path and line/column, not source
+excerpts or the parser's source-bearing error chain. MCP ingress, ID and complete
+response limits are described in `docs/MCP_CONTRACT.md`; unsafe frames close the
+connection. None of these changes authorizes executing repository content.
+
 1. Trusted application binary and compiled dependencies, including native grammars.
 2. Explicit user-selected root and trusted local runtime policy.
 3. Untrusted repository source, comments, documents, manifests, symlinks and filenames.
@@ -185,3 +197,18 @@ set `required=true` for this optional server. Never lower global execution polic
 request admin unnecessarily, kill unrelated processes, or pipe remote scripts to a
 shell. No auto-install dependencies at runtime. Uninstall must leave source and
 personal notes intact unless separately explicitly purged.
+
+Phase 15 implements this policy for macOS ARM64. The CLI requires absolute canonical
+root/binary paths, rejects a non-executable binary, config symlink, malformed TOML and
+an unowned `mcp_servers.codeatlas` collision. The ownership marker is a comment on the
+table rather than an unknown Codex key. Dry-run renders only that table's diff. Apply
+creates a restrictive sibling backup and temporary file, preserves the original mode,
+then uses same-directory atomic rename. The entry is optional (`required = false`) and
+uses Codex's normal 10-second startup and 60-second tool limits. Removal deletes only
+the marked table and does not touch source, indexes or project memories.
+
+The native package includes this privacy guide because a real Codex model session can
+transmit retrieved fixture/source text under the user's client policy. Automated
+Phase 15 tests use direct local subprocess clients and a disposable installed-Codex
+configuration parser check; they do not start a model-backed session or read/write
+the real user config.

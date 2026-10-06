@@ -1,0 +1,23 @@
+{
+  "architecture": "aarch64",
+  "archive_sha256": "56e0b3d1d31a709c10f60384e27f9c5306ceeff9a90299315b36a219c9482103",
+  "codex_config_round_trip": "pass",
+  "corrupt_database_did_not_block_tools_list": "pass",
+  "default_tools": 14,
+  "eof_shutdown": "pass",
+  "files_failed": 0,
+  "fixture_files": 7,
+  "inner_checksums": "pass",
+  "installed_codex_config_parse": "not run",
+  "installed_codex_version": null,
+  "minimal_path_no_language_sdks": true,
+  "model_backed_codex_session": "not run; no explicit authorization to transmit fixture source",
+  "protocols": [
+    "2026-07-28",
+    "2025-11-25"
+  ],
+  "schema_version": 1,
+  "target": "aarch64-apple-darwin",
+  "unicode_space_extraction": "pass",
+  "writer_follower": "pass"
+}

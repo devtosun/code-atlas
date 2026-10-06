@@ -7,7 +7,7 @@ use std::{
 use ca_core::{ByteRange, CancellationContext, GenerationId};
 use thiserror::Error;
 
-pub const RESOLVER_VERSION: &str = "codeatlas-resolver-v1";
+pub const RESOLVER_VERSION: &str = "codeatlas-resolver-v2";
 
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub enum ObservationKind {
@@ -220,6 +220,8 @@ pub enum ResolutionError {
     InvalidLimits,
     #[error("resolution cancelled")]
     Cancelled,
+    #[error("invalid or over-budget lexical scope chain")]
+    InvalidScopeChain,
 }
 
 #[derive(Clone, Debug)]
@@ -513,14 +515,14 @@ impl Resolver<'_> {
                 continue;
             }
 
-            let mut candidates = self.lexical_candidates(file_index, &occurrence, category);
+            let mut candidates = self.lexical_candidates(file_index, &occurrence, category)?;
             if candidates.is_empty() {
                 candidates = self.imported_candidates(file_index, &occurrence, category)?;
             }
             if candidates.is_empty() {
                 candidates = self.same_module_candidates(file_index, &occurrence, category);
             }
-            if category == ObservationKind::CallSite && has_uncertain_receiver(&occurrence) {
+            if has_uncertain_receiver(&occurrence) {
                 for candidate in &mut candidates {
                     candidate.rule = "receiver-name-candidate-v1";
                     candidate
@@ -663,13 +665,13 @@ impl Resolver<'_> {
         file_index: usize,
         occurrence: &ResolutionObservation,
         category: ObservationKind,
-    ) -> Vec<Candidate> {
+    ) -> Result<Vec<Candidate>, ResolutionError> {
         if has_uncertain_receiver(occurrence) {
-            return self.member_name_candidates(file_index, occurrence, category);
+            return Ok(self.member_name_candidates(file_index, occurrence, category));
         }
         let file = &self.input.files[file_index];
         let name = occurrence_name(occurrence);
-        let chain = scope_chain(file, occurrence.scope_id.as_deref());
+        let chain = scope_chain(file, occurrence.scope_id.as_deref(), self.cancellation)?;
         let mut ranked = Vec::new();
         for (observation_index, symbol) in file.observations.iter().enumerate() {
             if symbol.category != ObservationKind::Symbol
@@ -690,9 +692,9 @@ impl Resolver<'_> {
             ranked.push((distance, observation_index));
         }
         let Some(best) = ranked.iter().map(|(distance, _)| *distance).min() else {
-            return Vec::new();
+            return Ok(Vec::new());
         };
-        ranked
+        Ok(ranked
             .into_iter()
             .filter(|(distance, _)| *distance == best)
             .map(|(_, observation_index)| Candidate {
@@ -701,7 +703,7 @@ impl Resolver<'_> {
                 rule: "lexical-scope-v1",
                 evidence: vec![format!("scope_distance:{best}"), format!("name:{name}")],
             })
-            .collect()
+            .collect())
     }
 
     fn member_name_candidates(
@@ -740,18 +742,32 @@ impl Resolver<'_> {
         let file = &self.input.files[file_index];
         let (parsed_qualifier, name) = split_qualified_name(&occurrence.spelling);
         let qualifier = parsed_qualifier.or_else(|| occurrence.receiver.clone());
+        let chain = scope_chain(file, occurrence.scope_id.as_deref(), self.cancellation)?;
+        let matching = file
+            .observations
+            .iter()
+            .filter_map(|import| {
+                if import.category != ObservationKind::Import
+                    || is_module_declaration_observation(import)
+                    || is_local_export_observation(import)
+                {
+                    return None;
+                }
+                let distance = chain
+                    .iter()
+                    .position(|scope| import.scope_id.as_deref() == Some(scope))?;
+                let name =
+                    import_matches_occurrence(&file.language, import, qualifier.as_deref(), &name)?;
+                Some((distance, import, name))
+            })
+            .collect::<Vec<_>>();
+        let best = matching.iter().map(|(distance, _, _)| *distance).min();
         let mut candidates = Vec::new();
-        for import in file.observations.iter().filter(|observation| {
-            observation.category == ObservationKind::Import
-                && !is_module_declaration_observation(observation)
-                && !is_local_export_observation(observation)
-        }) {
+        for (_, import, imported_name) in matching
+            .into_iter()
+            .filter(|(distance, _, _)| Some(*distance) == best)
+        {
             self.check_cancelled()?;
-            let Some(imported_name) =
-                import_matches_occurrence(&file.language, import, qualifier.as_deref(), &name)
-            else {
-                continue;
-            };
             let ImportDestination::Local { files, rule } =
                 self.import_destination(file_index, import)
             else {
@@ -788,6 +804,9 @@ impl Resolver<'_> {
             if target_file_index == file_index
                 || target_file.language != file.language
                 || declared_module(target_file).as_deref() != Some(module.as_str())
+                || (file.language == "go"
+                    && Path::new(&target_file.relative_path).parent()
+                        != Path::new(&file.relative_path).parent())
             {
                 continue;
             }
@@ -948,12 +967,44 @@ impl Resolver<'_> {
             .cloned()
             .collect::<Vec<_>>();
         for reexport in reexports {
+            if file.language == "dart" && !dart_combinators_allow(&reexport, name) {
+                continue;
+            }
             let exported_name = reexport.alias.as_deref();
             if exported_name.is_some_and(|alias| alias != name) {
                 continue;
             }
-            let local_name =
-                attribute_value(&reexport.attributes, "local:").unwrap_or_else(|| name.to_owned());
+            let local_name = attribute_value(&reexport.attributes, "local:").unwrap_or_else(|| {
+                if reexport.kind == "export" && file.language != "dart" {
+                    reexport.spelling.clone()
+                } else {
+                    name.to_owned()
+                }
+            });
+            if reexport.kind == "export" && file.language != "dart" {
+                if reexport.alias.is_none() && reexport.spelling != name {
+                    continue;
+                }
+                for (observation_index, symbol) in file.observations.iter().enumerate() {
+                    if symbol.category == ObservationKind::Symbol
+                        && symbol.spelling == local_name
+                        && role_compatible(occurrence, symbol)
+                        && is_module_level_symbol(file, symbol)
+                        && (category != ObservationKind::CallSite || is_callable_kind(&symbol.kind))
+                    {
+                        output.push(Candidate {
+                            file_index,
+                            observation_index,
+                            rule: "local-export-v2",
+                            evidence: vec![
+                                format!("export_name:{name}"),
+                                format!("local_name:{local_name}"),
+                            ],
+                        });
+                    }
+                }
+                continue;
+            }
             let ImportDestination::Local { files, .. } =
                 self.import_destination(file_index, &reexport)
             else {
@@ -1484,7 +1535,11 @@ fn is_local_export_observation(observation: &ResolutionObservation) -> bool {
     observation.kind == "export"
 }
 
-fn scope_chain(file: &ResolutionFile, scope_id: Option<&str>) -> Vec<String> {
+fn scope_chain(
+    file: &ResolutionFile,
+    scope_id: Option<&str>,
+    cancellation: &CancellationContext,
+) -> Result<Vec<String>, ResolutionError> {
     let scopes = file
         .observations
         .iter()
@@ -1493,28 +1548,46 @@ fn scope_chain(file: &ResolutionFile, scope_id: Option<&str>) -> Vec<String> {
     let Some(mut current) =
         scope_id.and_then(|id| scopes.iter().find(|scope| scope.id == id).copied())
     else {
-        return scopes
+        return Ok(scopes
             .iter()
             .filter(|scope| scope.kind == "file")
             .map(|scope| scope.id.clone())
-            .collect();
+            .collect());
     };
     let mut output = Vec::new();
+    let mut visited = HashSet::new();
     loop {
+        if cancellation.is_cancelled() {
+            return Err(ResolutionError::Cancelled);
+        }
+        if output.len() >= 512 || !visited.insert(current.id.as_str()) {
+            return Err(ResolutionError::InvalidScopeChain);
+        }
         output.push(current.id.clone());
+        if current.kind == "file" {
+            break;
+        }
         let parent = scopes
             .iter()
             .filter(|candidate| {
-                candidate.id != current.id && contains(candidate.syntax_range, current.syntax_range)
+                candidate.id != current.id
+                    && contains(candidate.syntax_range, current.syntax_range)
+                    && (candidate.syntax_range != current.syntax_range || candidate.kind == "file")
             })
-            .min_by_key(|candidate| range_length(candidate.syntax_range))
+            .min_by_key(|candidate| {
+                (
+                    range_length(candidate.syntax_range),
+                    candidate.kind == "file",
+                    candidate.id.as_str(),
+                )
+            })
             .copied();
         let Some(parent) = parent else {
             break;
         };
         current = parent;
     }
-    output
+    Ok(output)
 }
 
 fn contains(outer: ByteRange, inner: ByteRange) -> bool {
@@ -1574,6 +1647,9 @@ fn import_matches_occurrence(
     qualifier: Option<&str>,
     name: &str,
 ) -> Option<String> {
+    if language == "dart" && !dart_combinators_allow(import, name) {
+        return None;
+    }
     match language {
         "javascript" | "jsx" | "typescript" | "tsx" => {
             let imported = attribute_value(&import.attributes, "imported:")?;
@@ -1624,6 +1700,18 @@ fn import_matches_occurrence(
         },
         _ => None,
     }
+}
+
+fn dart_combinators_allow(import: &ResolutionObservation, name: &str) -> bool {
+    import.attributes.iter().all(|attribute| {
+        if let Some(names) = attribute.strip_prefix("show:") {
+            names.split(',').any(|item| item == name)
+        } else if let Some(names) = attribute.strip_prefix("hide:") {
+            !names.split(',').any(|item| item == name)
+        } else {
+            true
+        }
+    })
 }
 
 fn attribute_value(attributes: &[String], prefix: &str) -> Option<String> {
@@ -2064,6 +2152,71 @@ mod tests {
             alias: None,
             attributes: Vec::new(),
             limitations: Vec::new(),
+        }
+    }
+
+    #[test]
+    fn equal_range_file_scope_terminates_and_observes_cancellation() {
+        let file = ResolutionFile {
+            relative_path: "a.rs".into(),
+            language: "rust".into(),
+            observations: vec![
+                observation(
+                    ObservationKind::Scope,
+                    "file",
+                    "file",
+                    "<file>",
+                    (0, 20),
+                    (0, 20),
+                    Some("function"),
+                ),
+                observation(
+                    ObservationKind::Scope,
+                    "function",
+                    "function",
+                    "main",
+                    (0, 20),
+                    (0, 20),
+                    Some("file"),
+                ),
+                observation(
+                    ObservationKind::Scope,
+                    "body",
+                    "block",
+                    "",
+                    (9, 20),
+                    (9, 20),
+                    Some("function"),
+                ),
+            ],
+        };
+        let cancel = CancellationContext::default();
+        assert_eq!(
+            scope_chain(&file, Some("body"), &cancel).expect("acyclic chain"),
+            ["body", "function", "file"]
+        );
+        cancel.cancel();
+        assert!(matches!(
+            scope_chain(&file, Some("body"), &cancel),
+            Err(ResolutionError::Cancelled)
+        ));
+    }
+
+    #[test]
+    fn dart_combinators_intersect_shows_and_subtract_hides() {
+        let mut import = observation(
+            ObservationKind::Import,
+            "import",
+            "import",
+            "a.dart",
+            (0, 1),
+            (0, 1),
+            None,
+        );
+        import.attributes = vec!["show:a,b".into(), "show:b,c".into(), "hide:c".into()];
+        assert!(dart_combinators_allow(&import, "b"));
+        for name in ["a", "c", "d"] {
+            assert!(!dart_combinators_allow(&import, name));
         }
     }
 

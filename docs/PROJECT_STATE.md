@@ -1,22 +1,33 @@
 # Project state
 
-Implementation status: PHASE 14 COMPLETE FOR THE SUPPORTED macOS ARM64 TARGET. The
-hardening pass adds
-generated path/ID/range/cursor/URI/generation/budget properties, dual-era adversarial
-MCP tests, killed-writer and migration rollback coverage, three bounded cargo-fuzz
-targets, schema-v6 cleanup/search indexes and reproducible 10k/100k measurement,
-accuracy and dependency artifacts. The repair run makes owner retrieval caching
-persistent, atomically clones parent generation membership, carries bounded watcher
-path hints and caches language fingerprints. The 100k exact-lookup and 10k
-post-debounce edit targets now pass. Three isolated fuzz runs, advisory/license
-policy scans, exhaustive reviewed declaration labels, a provenance-locked real
-project corpus and a stripped release binary close the macOS Phase 14 gates.
-Linux x64 and Windows x64 MSVC are explicitly deferred and remain unsupported.
+Review repairs (2026-10-06): CR-001–CR-013 from
+`docs/reviews/CODE_REVIEW_REPORT.md` are implemented and regression-tested against
+freshly compiled, locked native macOS ARM64 source. Workspace gates pass (130 tests,
+plus two subprocess helpers exercised by their parent tests), all seven existing
+xtask language/corpus gates pass, and the updated extracted package passes both MCP
+eras. Schema v7 preserves legacy version IDs/notes while invalidating incomplete
+analysis cache keys. Reindex explicitly after upgrading; back up before any
+downgrade. Search now traverses all 11,000 oracle results beyond the former ceiling.
+See `docs/reports/review-fixes.md` and ADR-0014 for fixes, exact hashes, retention,
+wire limits and fresh evidence. Historical Phase 14/15 hashes and measurements below
+remain historical, not validation of this repaired binary. No real Codex config,
+commit, push, publication or subsequent phase was performed in this repair turn.
+
+Implementation status: PHASE 15 COMPLETE FOR THE SUPPORTED macOS ARM64 TARGET. The
+locked native workflow now produces a deterministic unsigned archive with the
+stripped executable, quick-start, privacy guide, dependency notices, build metadata
+and checksums. The extracted archive passes seven-language indexing, modern/legacy
+stdio, owner/follower, corrupt-storage startup, EOF and safe Codex config round-trip
+tests from Unicode/space paths with no language SDK visible. The installed
+`codex-cli 0.154.0` parses a disposable config entry. No real user config changed and
+no model-backed session, signing, notarization or publication was performed. Linux
+x64 and Windows x64 MSVC remain explicitly deferred and unsupported.
 
 Current requested phase: none.
-Last completed implementation phase: 14 — hardening and evaluation on macOS ARM64.
-Last attempted phase: 14 — completed for the current supported target.
-Next prompt: `prompts/15-release-and-codex.md`.
+Current requested work: review repairs complete; no optional phase selected.
+Last completed implementation phase: 15 — native packaging and safe Codex integration on macOS ARM64.
+Last attempted phase: 15 — completed with the model-backed Codex smoke explicitly not run.
+Next prompt: `prompts/14-linux-windows-native-validation.md` when those targets are resumed.
 Deferred native qualification: `prompts/14-linux-windows-native-validation.md`.
 
 ## Phase ledger
@@ -37,7 +48,7 @@ Deferred native qualification: `prompts/14-linux-windows-native-validation.md`.
 | 12 | completed | `docs/reports/12-watch-and-incremental.md`; bounded opt-in watching, reconciliation and owner recovery |
 | 13 | completed | `docs/reports/13-memory-resources-prompts.md`; revisioned notes, typed resources/prompts and dual-era wire tests |
 | 14 | completed | `docs/reports/14-hardening-and-evaluation.md`; supported macOS ARM64 gates pass; Linux/Windows deferred and unsupported |
-| 15 | pending | not executed; macOS ARM64 prerequisite is complete |
+| 15 | completed | `docs/reports/15-release-and-codex.md`; macOS ARM64 package/integration gates pass, model-backed client session not run |
 | 16–17 optional | not selected | requires explicit phase request |
 
 ## Decisions already selected
@@ -370,19 +381,42 @@ and cargo-deny pass the locked graph and explicit source/license policy. These a
 bounded bug-finding and supply-chain checks, not proofs of native grammar safety or
 legal approval.
 
+## Phase 15 decisions
+
+The macOS ARM64 package is built from `Cargo.lock` with the pinned Rust toolchain and
+`--release --locked --offline`. Its deterministic tar/gzip stream fixes entry order,
+mtime, ownership and modes. The 25,013,888-byte Mach-O links only CoreFoundation,
+CoreServices, libiconv and libSystem; SQLite, grammars and query assets are embedded.
+The 5,484,074-byte archive has SHA-256
+`57e64086ba5fb066f0fd79f1a2aeda71080e7cb68e8a7c8a7ca023327485c427`.
+
+`integrate codex` uses exact `toml_edit` 0.25.15, canonical absolute binary/root
+paths, a comment-based ownership marker, surgical dry-run output and explicit
+backed-up apply/remove. It sets `required = false` and keeps the normal Codex timeout
+values. Malformed TOML, config symlinks, non-executable/relative paths and unowned
+name collisions fail without replacing the config. Removal does not purge source,
+indexes or project memories.
+
+The archive test runs after extraction into a Unicode/space path with an empty PATH,
+indexes one source in each required language, exercises both MCP protocol eras,
+checks follower reads, corrupt-database discovery/tools-list and EOF, then performs
+install/remove against a disposable config. The installed Codex CLI parses that
+entry. A model-backed Codex session remains unexecuted because it would transmit
+fixture content and no explicit authorization for that transmission was given.
+
 ## Current limitations and deferred targets
 
-Phase 14 is complete for the explicitly supported macOS 27.0 ARM64 target. Linux x64
+Phase 15 is complete for the explicitly supported macOS 27.0 ARM64 target. Linux x64
 and Windows x64 MSVC native path, junction, permission, watcher, process, lock and
 package tests are not run and those targets are not supported. Their exact later
 qualification workflow is `prompts/14-linux-windows-native-validation.md`.
 
-The measured 100k warm exact lookup and 10k post-debounce single-file edit targets
-pass. Cargo release-profile symbol stripping produces a 24,791,408-byte Mach-O that
-links only expected macOS system libraries. Native grammar C code and repository-read
+The measured Phase 14 100k warm exact lookup and 10k post-debounce single-file edit
+targets still pass. Phase 15 produces an unsigned/unnotarized 25,013,888-byte Mach-O
+that links only expected macOS system libraries. Native grammar C code and repository-read
 TOCTOU remain documented residual risks; no sandbox, hostile-co-tenant, representative
-multi-repository accuracy or cross-platform guarantee is claimed. Phase 15 may now
-proceed for macOS ARM64 only.
+multi-repository accuracy or cross-platform guarantee is claimed. The archive has not
+been publicly uploaded and the model-backed installed-Codex recipe remains manual.
 
 ## Update rule
 Append per-phase evidence and exact next step. Mark a phase blocked when an essential

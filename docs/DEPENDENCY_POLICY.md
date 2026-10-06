@@ -44,6 +44,17 @@ SQLite boundary to add `generation_files(file_version_id)` and
 the workspace-excluded `fuzz/` package with exact `libfuzzer-sys = 0.4.10`; this is a
 development-only declaration and is not linked into the production binary.
 
+Phase 15 adds exact `toml_edit = 0.25.15` (resolved package version
+`0.25.15+spec-1.1.0`, checksum recorded in `config/dependency-lock.json`) for
+format-preserving Codex configuration changes. Its parse/display dependencies are
+locked and included in the generated archive notices. No parser, database, network,
+daemon or language-runtime dependency is added. The refreshed macOS-target locked
+inventory contains 246 third-party registry packages with complete declared license
+metadata and no Git/path third-party source. Cargo-audit scans 299 locked dependencies
+against 1,251 cached advisories with zero findings; cargo-deny again passes advisories,
+bans, licenses and sources. Evidence is
+`docs/reports/artifacts/15-dependency-inventory.json`.
+
 The macOS-target `cargo metadata --locked --offline` inventory contains 241
 third-party registry packages, no Git/path third-party source and no missing declared
 license/license-file metadata. `deny.toml` explicitly permits only the reviewed
@@ -56,6 +67,14 @@ of the production toolchain or runtime. See the dependency and fuzz artifacts un
 `docs/reports/artifacts/`.
 
 ## Lock manifest requirements
+
+The review repairs declare existing locked `futures = 0.3.34` and
+`tokio-util = 0.7.19` directly in `ca-mcp` to compose the official rmcp framed
+transport and cooperative shutdown. Their required `codec`/`rt` features are locked;
+no newly downloaded runtime package, custom protocol implementation or network
+feature is introduced. Prior audit/fuzz results are historical, not fresh scans of
+these repairs; new workspace/transport/package evidence is in the repair report.
+
 Record Rust toolchain/MSRV/target, rmcp version and features, supported protocol
 revisions, serde/schemars pairing, tree-sitter runtime ABI range, every grammar
 package version/source/checksum/ABI, query hashes, SQLite runtime version and compile

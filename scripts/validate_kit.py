@@ -150,14 +150,15 @@ def run() -> list[str]:
     for phase in range(14):
         require(f"| {phase:02d} | completed |" in project_state, f"Phase {phase:02d} completion state missing")
     require("| 14 | completed |" in project_state, "Phase 14 completion state missing")
-    require("prompts/15-release-and-codex.md" in project_state, "Phase 15 handoff missing")
+    require("| 15 | completed |" in project_state, "Phase 15 completion state missing")
     require(
         "prompts/14-linux-windows-native-validation.md" in project_state,
         "Deferred native validation prompt missing",
     )
     dependency_lock = load_json("config/dependency-lock.json")
-    require(dependency_lock["phase"] == "14-hardening-and-evaluation", "Wrong dependency lock phase")
+    require(dependency_lock["phase"] == "15-release-and-codex", "Wrong dependency lock phase")
     require("production_phase_14" in dependency_lock, "Missing Phase 14 production dependency record")
+    require("production_phase_15" in dependency_lock, "Missing Phase 15 production dependency record")
     require(dependency_lock["sqlite"]["fts5_transaction"] == "pass", "Missing SQLite evidence")
     existing_relative("spikes/compatibility/Cargo.lock")
     existing_relative("docs/reports/00-compatibility-spike.md")

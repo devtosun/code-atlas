@@ -39,7 +39,7 @@
       "binding_precision": {"numerator": 5, "denominator": 5},
       "binding_recall": {"numerator": 5, "denominator": 5},
       "unresolved_rate": {"numerator": 0, "denominator": 5},
-      "candidate_sites": 3,
+      "candidate_sites": 4,
       "external_observation_sites": 1
     },
     {

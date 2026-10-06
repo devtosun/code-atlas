@@ -38,7 +38,6 @@ const MAX_REQUEST_KEY_BYTES: usize = 256;
 const MAX_RESOLUTION_EDGES: usize = 1_000_000;
 const MAX_EXTERNAL_NODES: usize = 100_000;
 const MAX_RESOLUTION_DIAGNOSTICS: usize = 100_000;
-const MAX_RETRIEVAL_CANDIDATES: usize = 10_000;
 
 static NEXT_JOB_ID: AtomicU64 = AtomicU64::new(1);
 static NEXT_MEMORY_ID: AtomicU64 = AtomicU64::new(1);
@@ -1240,7 +1239,7 @@ impl Storage {
         validate_schema_and_root(&connection, self.repository_id.as_str())?;
         let mut statement = connection.prepare(
             "SELECT files.relative_path, fv.content_hash, fv.grammar_hash, fv.query_hash,
-                    fv.extractor_hash, generations.config_hash
+                    fv.extractor_hash, fv.config_hash
              FROM meta
              JOIN generations ON generations.id = meta.active_generation_id
              JOIN generation_files AS gf ON gf.generation_id = meta.active_generation_id
@@ -2863,28 +2862,45 @@ fn stage_file(
     )?;
     let byte_length = i64::try_from(file.byte_length)
         .map_err(|_| StorageError::InvalidInput("file length exceeds SQLite INTEGER".to_owned()))?;
-    transaction.execute(
+    let config_hash: String = transaction.query_row(
+        "SELECT config_hash FROM generations WHERE id = ?1",
+        [generation_id],
+        |row| row.get(0),
+    )?;
+    let mut analysis_key = String::from("analysis-v1:");
+    for part in [
+        &file.language,
+        &file.grammar_hash,
+        &file.query_hash,
+        &file.extractor_hash,
+        &config_hash,
+    ] {
+        analysis_key.push_str(&format!("{}:{part}", part.len()));
+    }
+    let inserted = transaction.execute(
         "INSERT INTO file_versions(
-            file_id, content_hash, extractor_hash, byte_length, source_encoding,
-            language, grammar_hash, query_hash, parse_status, coverage_json
-         ) VALUES (?1, ?2, ?3, ?4, 'utf-8', ?5, ?6, ?7, ?8, ?9)
-         ON CONFLICT(file_id, content_hash, extractor_hash) DO NOTHING",
+            file_id, content_hash, analysis_key, byte_length, source_encoding,
+            language, grammar_hash, query_hash, parse_status, coverage_json, extractor_hash, config_hash
+         ) VALUES (?1, ?2, ?3, ?4, 'utf-8', ?5, ?6, ?7, ?8, ?9, ?10, ?11)
+         ON CONFLICT(file_id, content_hash, analysis_key) DO NOTHING",
         params![
             file_id,
             file.content_hash,
-            file.extractor_hash,
+            analysis_key,
             byte_length,
             file.language,
             file.grammar_hash,
             file.query_hash,
             file.parse_status,
             file.coverage_json,
+            file.extractor_hash,
+            config_hash,
         ],
     )?;
     let file_version_id: i64 = transaction.query_row(
         "SELECT id FROM file_versions
-         WHERE file_id = ?1 AND content_hash = ?2 AND extractor_hash = ?3",
-        params![file_id, file.content_hash, file.extractor_hash],
+         WHERE file_id = ?1 AND content_hash = ?2 AND analysis_key = ?3",
+        params![file_id, file.content_hash, analysis_key],
         |row| row.get(0),
     )?;
     transaction.execute(
@@ -2893,6 +2909,9 @@ fn stage_file(
          ON CONFLICT(generation_id, file_id) DO UPDATE SET file_version_id = excluded.file_version_id",
         params![generation_id, file_id, file_version_id],
     )?;
+    if inserted == 0 {
+        return Ok(());
+    }
     for fact in &file.facts {
         transaction.execute(
             "INSERT INTO facts(id, file_version_id, kind, name, start_byte, end_byte)
@@ -3360,6 +3379,15 @@ fn abandon_generation(
 
 fn gc_abandoned(connection: &mut Connection) -> Result<(), StorageError> {
     let transaction = connection.transaction()?;
+    // Keep active plus its immediate predecessor. Detach historical parent links
+    // before collection; memories are independent of generation lifetime.
+    transaction.execute("UPDATE generations SET parent_id = NULL WHERE parent_id IN (
+        SELECT id FROM generations WHERE status = 'superseded' AND id NOT IN (
+            SELECT parent_id FROM generations WHERE status IN ('active', 'building') AND parent_id IS NOT NULL
+        ))", [])?;
+    transaction.execute("DELETE FROM generations WHERE status = 'superseded' AND id NOT IN (
+        SELECT parent_id FROM generations WHERE status IN ('active', 'building') AND parent_id IS NOT NULL
+    )", [])?;
     transaction.execute(
         "DELETE FROM generations
          WHERE status = 'abandoned'
@@ -3973,7 +4001,14 @@ impl ReadSnapshot {
             .path_prefix
             .as_deref()
             .map(|path| format!("{}/%", escape_sql_like(path)));
-        let candidate_limit = to_sql_limit(MAX_RETRIEVAL_CANDIDATES)?;
+        let candidate_limit = to_sql_limit(plan.fetch_limit)?;
+        let after = plan.after.as_ref();
+        let after_tier = after.map(|key| key.tier);
+        let after_score = after.map_or(0.0, |key| key.fts_score);
+        let after_path = after.map_or("", |key| key.relative_path.as_str());
+        let after_name = after.map_or("", |key| key.name.as_str());
+        let after_start = as_i64(after.map_or(0, |key| key.start_byte), "cursor start")?;
+        let after_id = after.map_or("", |key| key.symbol_id.as_str());
         let mut candidates = Vec::new();
         let mut direct = self.connection.prepare(
             "SELECT * FROM (
@@ -4000,6 +4035,7 @@ impl ReadSnapshot {
                  JOIN files ON files.id = gf.file_id
                  JOIN file_versions AS fv ON fv.id = gf.file_version_id
                  WHERE lower(s.spelling) = ?3 AND gf.generation_id = ?1
+                   AND s.spelling <> ?2
                    AND (?5 IS NULL OR fv.language = ?5)
                    AND (?6 IS NULL OR s.kind = ?6)
                    AND (?7 IS NULL OR files.relative_path = ?7
@@ -4016,6 +4052,7 @@ impl ReadSnapshot {
                  JOIN files ON files.id = gf.file_id
                  JOIN file_versions AS fv ON fv.id = gf.file_version_id
                  WHERE lower(s.spelling) >= ?3
+                   AND lower(s.spelling) <> ?3
                    AND lower(s.spelling) < (?3 || char(1114111))
                    AND lower(s.spelling) LIKE ?4 ESCAPE '\\'
                    AND gf.generation_id = ?1
@@ -4024,6 +4061,8 @@ impl ReadSnapshot {
                    AND (?7 IS NULL OR files.relative_path = ?7
                         OR files.relative_path LIKE ?8 ESCAPE '\\')
              ) AS ranked
+             WHERE (?10 IS NULL OR (tier, 0.0, relative_path, spelling, start_byte, observation_id)
+                    > (?10, ?11, ?12, ?13, ?14, ?15))
              ORDER BY tier, relative_path, spelling, start_byte, observation_id LIMIT ?9",
         )?;
         let rows = direct.query_map(
@@ -4037,6 +4076,12 @@ impl ReadSnapshot {
                 plan.path_prefix,
                 path_like,
                 candidate_limit,
+                after_tier,
+                after_score,
+                after_path,
+                after_name,
+                after_start,
+                after_id,
             ],
             |row| {
                 Ok(StoredSearchSymbol {
@@ -4067,6 +4112,8 @@ impl ReadSnapshot {
                    AND (?5 IS NULL OR s.kind = ?5)
                    AND (?6 IS NULL OR files.relative_path = ?6
                         OR files.relative_path LIKE ?7 ESCAPE '\\')
+                   AND (?9 IS NULL OR (0, 0.0, files.relative_path, s.spelling, s.start_byte, s.observation_id)
+                        > (?9, ?10, ?11, ?12, ?13, ?14))
                  ORDER BY files.relative_path, s.spelling, s.start_byte,
                           s.observation_id LIMIT ?8",
             )?;
@@ -4080,6 +4127,12 @@ impl ReadSnapshot {
                     plan.path_prefix,
                     path_like,
                     candidate_limit,
+                    after_tier,
+                    after_score,
+                    after_path,
+                    after_name,
+                    after_start,
+                    after_id,
                 ],
                 |row| {
                     Ok(StoredSearchSymbol {
@@ -4094,23 +4147,37 @@ impl ReadSnapshot {
             }
         }
         let mut full_text = self.connection.prepare(
-            "SELECT s.observation_id, files.relative_path, fv.language, s.kind,
+            "WITH fts_matches AS MATERIALIZED (
+                 SELECT sd.file_version_id, sd.name, bm25(symbol_fts) AS score
+                 FROM symbol_fts JOIN search_documents AS sd ON sd.id = symbol_fts.rowid
+                 JOIN generation_files AS gf ON gf.file_version_id = sd.file_version_id
+                 WHERE symbol_fts MATCH ?1 AND gf.generation_id = ?2
+                   AND lower(sd.name) NOT LIKE ?8 ESCAPE '\\'
+             ), scores AS (
+                 SELECT file_version_id, name, MIN(score) AS score FROM fts_matches
+                 GROUP BY file_version_id, name
+             )
+             SELECT s.observation_id, files.relative_path, fv.language, s.kind,
                     s.spelling, s.container, s.signature, s.start_byte, s.end_byte,
                     s.syntax_start_byte, s.syntax_end_byte, fv.content_hash,
                     fv.parse_status, s.attributes_json, s.limitations_json,
-                    bm25(symbol_fts) AS score
-             FROM symbol_fts
-             JOIN search_documents AS sd ON sd.id = symbol_fts.rowid
-             JOIN generation_files AS gf ON gf.file_version_id = sd.file_version_id
+                    scores.score
+             FROM scores
+             JOIN generation_files AS gf ON gf.file_version_id = scores.file_version_id
              JOIN files ON files.id = gf.file_id
              JOIN file_versions AS fv ON fv.id = gf.file_version_id
-             JOIN symbols AS s ON s.file_version_id = gf.file_version_id
-                              AND s.spelling = sd.name
-             WHERE symbol_fts MATCH ?1 AND gf.generation_id = ?2
+             JOIN symbols AS s INDEXED BY symbols_version_spelling_idx ON s.file_version_id = gf.file_version_id
+                              AND s.spelling = scores.name
+             WHERE gf.generation_id = ?2
+               AND lower(s.spelling) NOT LIKE ?8 ESCAPE '\\'
+               AND NOT ((COALESCE(s.container, '') || '.' || s.spelling = ?9)
+                    OR (COALESCE(s.container, '') || '::' || s.spelling = ?9))
                AND (?3 IS NULL OR fv.language = ?3)
                AND (?4 IS NULL OR s.kind = ?4)
                AND (?5 IS NULL OR files.relative_path = ?5
                     OR files.relative_path LIKE ?6 ESCAPE '\\')
+               AND (?10 IS NULL OR (5, scores.score, files.relative_path, s.spelling, s.start_byte, s.observation_id)
+                    > (?10, ?11, ?12, ?13, ?14, ?15))
              ORDER BY score, files.relative_path, s.spelling, s.start_byte,
                       s.observation_id LIMIT ?7",
         )?;
@@ -4123,6 +4190,14 @@ impl ReadSnapshot {
                 plan.path_prefix,
                 path_like,
                 candidate_limit,
+                plan.escaped_folded_prefix,
+                plan.query,
+                after_tier,
+                after_score,
+                after_path,
+                after_name,
+                after_start,
+                after_id,
             ],
             |row| {
                 Ok(StoredSearchSymbol {
@@ -4771,6 +4846,7 @@ impl Drop for ReadSnapshot {
 #[cfg(test)]
 mod tests {
     use std::{
+        collections::BTreeSet,
         process::Command,
         sync::atomic::{AtomicU64, Ordering},
         time::{SystemTime, UNIX_EPOCH},
@@ -4878,6 +4954,15 @@ mod tests {
     }
 
     fn start_generation_with_file(storage: &Storage, id: &str, file: StagedFile) -> JobRecord {
+        start_generation_with_config(storage, id, file, "config-v1")
+    }
+
+    fn start_generation_with_config(
+        storage: &Storage,
+        id: &str,
+        file: StagedFile,
+        config: &str,
+    ) -> JobRecord {
         let job = storage
             .create_job(NewJob {
                 mode: "full".to_owned(),
@@ -4907,7 +4992,7 @@ mod tests {
             .begin_generation(GenerationPlan {
                 generation_id: generation_id.clone(),
                 job_id: job.id.clone(),
-                config_hash: "config-v1".to_owned(),
+                config_hash: config.to_owned(),
                 extractor_set_hash: "extractor-set-v1".to_owned(),
                 reuse_parent: false,
                 deleted_paths: Vec::new(),
@@ -4964,6 +5049,278 @@ mod tests {
         storage
             .activate_generation(GenerationId::new(id).expect("valid generation ID"))
             .expect("activate complete generation");
+    }
+
+    #[test]
+    fn complete_analysis_identity_keeps_versions_immutable() {
+        let layout = TestLayout::new("analysis-identity");
+        let storage = layout.open();
+        stage_and_activate(&storage, "initial", "original", 'a');
+        let original = storage.read_snapshot().expect("pinned original");
+        let mut file = staged_file("changed", "changed", 'a');
+        for index in 0..4 {
+            match index {
+                0 => file.grammar_hash = "grammar-v2".into(),
+                1 => file.query_hash = "query-v2".into(),
+                2 => file.extractor_hash = "extractor-v2".into(),
+                _ => {}
+            }
+            let id = format!("analysis-{index}");
+            let job = start_generation_with_config(
+                &storage,
+                &id,
+                file.clone(),
+                if index == 3 { "config-v2" } else { "config-v1" },
+            );
+            finish_generation(&storage, &id, &job, true);
+            storage
+                .activate_generation(GenerationId::new(&id).expect("id"))
+                .expect("activate");
+        }
+        let mut changed_payload = file;
+        changed_payload.facts[0].name = "must_not_append".into();
+        changed_payload.facts[0].id = "new-fact-id".into();
+        let job = start_generation_with_config(&storage, "reuse", changed_payload, "config-v2");
+        finish_generation(&storage, "reuse", &job, true);
+        storage
+            .activate_generation(GenerationId::new("reuse").expect("id"))
+            .expect("activate reuse");
+        assert_eq!(
+            original.facts().expect("original unchanged")[0].name,
+            "original"
+        );
+        assert_eq!(
+            storage
+                .read_snapshot()
+                .expect("new snapshot")
+                .facts()
+                .expect("immutable reused facts")[0]
+                .name,
+            "changed"
+        );
+        let connection =
+            open_reader_connection(layout.paths.database_path()).expect("read versions");
+        assert_eq!(
+            connection
+                .query_row("SELECT count(*) FROM file_versions", [], |row| row
+                    .get::<_, i64>(0))
+                .expect("version count"),
+            5
+        );
+        assert_eq!(
+            storage.active_files().expect("active fingerprint")[0].config_hash,
+            "config-v2"
+        );
+    }
+
+    #[test]
+    fn sql_keysets_page_across_all_ranking_tiers_without_fts_duplicates() {
+        let layout = TestLayout::new("keyset-tiers");
+        let storage = layout.open();
+        let mut file = staged_file("ranking", "work", 'a');
+        let template = file.observations[0].clone();
+        file.observations.clear();
+        file.search_documents.clear();
+        file.byte_length = 10_000;
+        for (index, name) in ["work", "WORK", "workAlpha", "WorkBeta", "Other"]
+            .iter()
+            .cycle()
+            .take(100)
+            .enumerate()
+        {
+            let mut symbol = template.clone();
+            symbol.id = format!("symbol-{index}");
+            symbol.spelling = (*name).into();
+            symbol.container = Some("Class".into());
+            symbol.byte_range =
+                ByteRange::new(index as u64 * 32, index as u64 * 32 + 6).expect("range");
+            symbol.syntax_range =
+                ByteRange::new(index as u64 * 32, index as u64 * 32 + 32).expect("syntax");
+            file.observations.push(symbol);
+            file.search_documents.push(SearchDocument {
+                name: (*name).into(),
+                content: format!("work evidence {index}"),
+            });
+        }
+        let job = start_generation_with_file(&storage, "ranking", file);
+        finish_generation(&storage, "ranking", &job, true);
+        storage
+            .activate_generation(GenerationId::new("ranking").expect("id"))
+            .expect("activate");
+        let snapshot = storage.read_snapshot().expect("snapshot");
+        for (query, fts, expected) in [
+            ("work", "\"work\"", 100),
+            ("Class.work", "\"Class\" AND \"work\"", 20),
+        ] {
+            let mut plan = StoredSearchPlan {
+                query: query.into(),
+                folded_query: query.to_lowercase(),
+                escaped_folded_prefix: format!("{}%", query.to_lowercase()),
+                fts_expression: fts.into(),
+                language: None,
+                kind: None,
+                path_prefix: None,
+                after: None,
+                fetch_limit: 7,
+            };
+            let mut seen = HashSet::new();
+            let mut tiers = BTreeSet::new();
+            loop {
+                let rows = snapshot
+                    .retrieval_search_symbols(&plan)
+                    .expect("keyset page");
+                if rows.is_empty() {
+                    break;
+                }
+                for row in &rows {
+                    assert!(
+                        seen.insert(row.symbol.id.clone()),
+                        "no duplicate across tiers/pages"
+                    );
+                    tiers.insert(row.tier);
+                }
+                let last = rows.last().expect("nonempty page");
+                plan.after = Some(StoredSearchAfter {
+                    tier: last.tier,
+                    fts_score: last.fts_score,
+                    relative_path: last.symbol.relative_path.clone(),
+                    name: last.symbol.name.clone(),
+                    start_byte: last.symbol.start_byte,
+                    symbol_id: last.symbol.id.clone(),
+                });
+            }
+            assert_eq!(seen.len(), expected);
+            assert_eq!(
+                tiers,
+                if query == "work" {
+                    BTreeSet::from([1, 2, 3, 4, 5])
+                } else {
+                    BTreeSet::from([0])
+                }
+            );
+        }
+    }
+
+    #[test]
+    fn generation_retention_keeps_active_previous_and_pinned_readers_not_history() {
+        let layout = TestLayout::new("bounded-history");
+        let storage = layout.open();
+        storage
+            .put_memory("sentinel".into(), "keep memory".into())
+            .expect("memory");
+        stage_and_activate(&storage, "first", "first", 'a');
+        let pinned = storage.read_snapshot().expect("old snapshot");
+        for index in 0..100 {
+            let id = format!("revision-{index}");
+            stage_and_activate(&storage, &id, &id, if index % 2 == 0 { 'b' } else { 'c' });
+            storage.gc_abandoned().expect("bounded GC");
+        }
+        assert_eq!(
+            pinned.facts().expect("pinned WAL snapshot")[0].name,
+            "first"
+        );
+        let connection = open_reader_connection(layout.paths.database_path()).expect("reader");
+        assert_eq!(
+            connection
+                .query_row("SELECT count(*) FROM generations", [], |row| row
+                    .get::<_, i64>(0))
+                .expect("generations"),
+            2
+        );
+        assert!(
+            connection
+                .query_row("SELECT count(*) FROM file_versions", [], |row| row
+                    .get::<_, i64>(0))
+                .expect("versions")
+                <= 2
+        );
+        assert!(
+            connection
+                .prepare("PRAGMA foreign_key_check")
+                .expect("FK check")
+                .query([])
+                .expect("FK rows")
+                .next()
+                .expect("FK result")
+                .is_none()
+        );
+        assert_eq!(
+            storage
+                .read_memory("sentinel")
+                .expect("memory survives")
+                .as_deref(),
+            Some("keep memory")
+        );
+    }
+
+    #[test]
+    fn schema_seven_preserves_legacy_version_ids_and_invalidates_cache() {
+        let mut connection = Connection::open_in_memory().expect("legacy DB");
+        configure_connection(&connection, false).expect("configure");
+        schema::migrate_to(&mut connection, "repo-legacy", 6).expect("v6");
+        connection.execute_batch("INSERT INTO files(id, relative_path) VALUES(42, 'a.rs');
+            INSERT INTO file_versions(id, file_id, content_hash, extractor_hash, byte_length, source_encoding) VALUES(99,42,'hash','extractor-old',10,'utf-8');
+            INSERT INTO facts(id,file_version_id,kind,name,start_byte,end_byte) VALUES('fact',99,'function','old',0,3);
+            INSERT INTO memories(id,body,created_at) VALUES('sentinel','private note',1);").expect("legacy rows");
+        schema::migrate(&mut connection, "repo-legacy").expect("v7 migration");
+        let fingerprint: (i64, String, String) = connection
+            .query_row(
+                "SELECT id, extractor_hash, config_hash FROM file_versions",
+                [],
+                |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
+            )
+            .expect("legacy identity");
+        assert_eq!(fingerprint, (99, "extractor-old".into(), "".into()));
+        assert_eq!(
+            connection
+                .query_row("SELECT file_version_id FROM facts", [], |row| row
+                    .get::<_, i64>(0))
+                .expect("fact survives"),
+            99
+        );
+        assert_eq!(
+            connection
+                .query_row("SELECT body FROM memories", [], |row| row
+                    .get::<_, String>(0))
+                .expect("note survives"),
+            "private note"
+        );
+        assert!(
+            connection
+                .prepare("PRAGMA foreign_key_check")
+                .expect("FK check")
+                .query([])
+                .expect("FK rows")
+                .next()
+                .expect("FK result")
+                .is_none()
+        );
+    }
+
+    #[test]
+    fn schema_seven_failure_rolls_back_column_rename_and_fingerprints() {
+        let mut connection = Connection::open_in_memory().expect("legacy DB");
+        configure_connection(&connection, false).expect("configure");
+        schema::migrate_to(&mut connection, "repo-rollback", 6).expect("v6");
+        connection.execute_batch("INSERT INTO files(id,relative_path) VALUES(1,'a.rs');
+            INSERT INTO file_versions(file_id,content_hash,extractor_hash,byte_length,source_encoding) VALUES(1,'hash','old',1,'utf-8');
+            CREATE TRIGGER refuse_version_update BEFORE UPDATE ON file_versions BEGIN SELECT RAISE(FAIL,'injected migration failure'); END;").expect("failure fixture");
+        assert!(schema::migrate(&mut connection, "repo-rollback").is_err());
+        assert_eq!(schema::schema_version(&connection).expect("version"), 6);
+        assert_eq!(
+            connection
+                .query_row("SELECT extractor_hash FROM file_versions", [], |row| row
+                    .get::<_, String>(
+                    0
+                ))
+                .expect("old column intact"),
+            "old"
+        );
+        assert!(
+            connection
+                .prepare("SELECT analysis_key FROM file_versions")
+                .is_err()
+        );
     }
 
     #[test]

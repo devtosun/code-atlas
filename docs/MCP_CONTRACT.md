@@ -1,6 +1,16 @@
 # MCP and CLI contract
 
 ## Version boundary
+
+Review-repair wire policy: prompt text is capped at 8192 UTF-8 bytes and optional
+scope at 4096 bytes, with an additional exact serialized-result check. Request IDs
+must serialize to at most 128 bytes (JSON escaping counts). Official rmcp codecs
+bound incoming JSON lines at 1 MiB. IDs over the limit or invalid/oversized frames
+end the connection before SDK dispatch rather than echoing an unsafe ID. Every
+outgoing SDK message is checked including its JSON-RPC wrapper and newline against
+65536 bytes. An over-budget SDK error also closes the session cooperatively; it is
+never sent as a truncated JSON fragment. These guards do not mix the two eras.
+
 Verified Phase 00 baseline: modern MCP 2026-07-28 and legacy 2025-11-25 using
 published official rmcp 3.4.0. The installed `codex-cli 0.154.0` was recorded, but
 its negotiated lifecycle was not introspected. Do not equate documentation on main
@@ -106,11 +116,13 @@ inside the server or guarantee that Codex exposes every prompt via a slash comma
 - `codeatlas integrate codex --root <path> --dry-run`: show a surgical config diff.
 - `codeatlas integrate codex --root <path> --apply`: explicit backed-up config write.
 - `codeatlas integrate codex --remove --dry-run|--apply`: remove only owned entry.
-- `codeatlas config validate`: validate local config without indexing/execution.
+- `codeatlas config validate`: future target; not implemented in Phase 15.
 
-These commands are implementation targets until their corresponding phase is
-completed. Help/examples must remain truthful during development. CLI JSON output
-is allowed on stdout only outside MCP serve mode.
+The Phase 15 `integrate codex` commands are implemented with an owned comment marker,
+entry-level dry-run diff, collision/malformed-config rejection, sibling backup and
+same-directory atomic replacement. Other commands remain implementation targets only
+where explicitly labelled. CLI JSON output is allowed on stdout only outside MCP
+serve mode.
 
 Phase 11 advertises the first thirteen rows above: status, asynchronous application
 index jobs and all Phase 10 retrieval operations. Every handler has a generated,

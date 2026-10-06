@@ -1,5 +1,6 @@
 #![forbid(unsafe_code)]
 
+mod codex_integration;
 mod indexer;
 mod mcp_backend;
 mod memory;
@@ -87,6 +88,36 @@ enum Command {
         #[arg(long)]
         json: bool,
     },
+    /// Safely add or remove the owned CodeAtlas entry in Codex configuration.
+    Integrate {
+        #[command(subcommand)]
+        target: IntegrationTarget,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+enum IntegrationTarget {
+    /// Integrate this native binary with Codex without changing global PATH.
+    Codex {
+        /// Absolute repository root authorized for this Codex server.
+        #[arg(long, value_name = "ABSOLUTE_PATH")]
+        root: Option<PathBuf>,
+        /// Absolute CodeAtlas executable; defaults to the running executable.
+        #[arg(long, value_name = "ABSOLUTE_PATH")]
+        binary: Option<PathBuf>,
+        /// Absolute Codex TOML path; defaults to $CODEX_HOME/config.toml or ~/.codex/config.toml.
+        #[arg(long, value_name = "ABSOLUTE_PATH")]
+        config: Option<PathBuf>,
+        /// Remove only an entry previously created by CodeAtlas.
+        #[arg(long)]
+        remove: bool,
+        /// Print the proposed entry-level diff without writing.
+        #[arg(long, conflicts_with = "apply", required_unless_present = "apply")]
+        dry_run: bool,
+        /// Back up the current file and atomically apply the proposed change.
+        #[arg(long, conflicts_with = "dry_run", required_unless_present = "dry_run")]
+        apply: bool,
+    },
 }
 
 #[derive(Debug, Error)]
@@ -109,6 +140,8 @@ enum CliError {
     Mcp(#[from] ca_mcp::McpServerError),
     #[error(transparent)]
     Watch(#[from] watcher::WatchError),
+    #[error(transparent)]
+    CodexIntegration(#[from] codex_integration::CodexIntegrationError),
     #[error("cannot encode CLI output: {0}")]
     Json(#[from] serde_json::Error),
 }
@@ -508,6 +541,36 @@ async fn run(cli: Cli) -> Result<(), CliError> {
                     println!("latest job: {} ({})", job.id, job.state);
                 }
             })?;
+        }
+        Command::Integrate {
+            target:
+                IntegrationTarget::Codex {
+                    root,
+                    binary,
+                    config,
+                    remove,
+                    dry_run: _,
+                    apply,
+                },
+        } => {
+            let result = codex_integration::run(codex_integration::Request {
+                root,
+                binary,
+                config,
+                remove,
+                apply,
+            })?;
+            print!("{}", result.diff);
+            if apply {
+                if let Some(backup) = result.backup {
+                    println!("backup: {}", backup.display());
+                } else {
+                    println!("backup: not needed (new config)");
+                }
+                println!("applied: {}", result.config.display());
+            } else {
+                println!("dry-run: no files changed");
+            }
         }
     }
     Ok(())

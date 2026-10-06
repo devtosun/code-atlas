@@ -643,26 +643,27 @@ where
         let (source_tx, source_rx) =
             mpsc::sync_channel::<SourceTask>(self.limits.source_queue_capacity);
         let source_rx = Arc::new(Mutex::new(source_rx));
-        let (result_tx, result_rx) = mpsc::channel::<Result<IndexedFile, ExtractionFailure>>();
+        let (result_tx, result_rx) = mpsc::sync_channel::<Result<IndexedFile, ExtractionFailure>>(
+            self.limits.source_queue_capacity,
+        );
         let shared_cancel = cancellation.clone();
-        let mut sent = 0_usize;
         let mut last_durable_cancel_check = Instant::now();
+        let mut workers = Vec::with_capacity(self.limits.worker_count);
+        for _ in 0..self.limits.worker_count {
+            workers.push(
+                self.extractor_factory
+                    .create()
+                    .map_err(|error| IndexingError::Extractor(error.message))?,
+            );
+        }
 
         thread::scope(|scope| -> Result<(), IndexingError> {
             let mut handles = Vec::with_capacity(self.limits.worker_count);
-            for _ in 0..self.limits.worker_count {
+            for mut worker in workers {
                 let receiver = Arc::clone(&source_rx);
                 let sender = result_tx.clone();
                 let worker_cancel = shared_cancel.clone();
-                let factory = self.extractor_factory;
                 handles.push(scope.spawn(move || {
-                    let mut worker = match factory.create() {
-                        Ok(worker) => worker,
-                        Err(error) => {
-                            let _ = sender.send(Err(error));
-                            return;
-                        }
-                    };
                     loop {
                         let task = match receiver.lock() {
                             Ok(guard) => guard.recv(),
@@ -679,134 +680,175 @@ where
                 }));
             }
             drop(result_tx);
+            drop(source_rx);
 
-            for scanned in scanned_files {
-                if shared_cancel.is_cancelled() {
-                    return Err(IndexingError::Cancelled);
-                }
-                if last_durable_cancel_check.elapsed() >= DURABLE_CANCELLATION_POLL_INTERVAL {
-                    self.check_cancelled(job_id, &shared_cancel)?;
-                    last_durable_cancel_check = Instant::now();
-                }
-                let fingerprints = self
-                    .extractor_factory
-                    .fingerprints(&scanned.relative_path)
-                    .map_err(|error| IndexingError::Extractor(error.message))?;
-                let reusable = request.mode == IndexMode::Incremental
-                    && active
-                        .get(scanned.relative_path.as_str())
-                        .is_some_and(|prior| {
-                            prior.content_hash == scanned.content_hash
-                                && prior.grammar_fingerprint == fingerprints.grammar
-                                && prior.query_fingerprint == fingerprints.query
-                                && prior.extractor_fingerprint == fingerprints.extractor
-                                && prior.config_fingerprint == request.config_fingerprint
-                        });
-                if reusable {
-                    progress.files_reused = progress.files_reused.saturating_add(1);
-                    progress.files_persisted = progress.files_persisted.saturating_add(1);
-                    continue;
-                }
-                let source = self
-                    .reader
-                    .read(&scanned.relative_path)
-                    .map_err(|error| IndexingError::ScanIncomplete(error.to_string()))?;
-                if source.content_hash() != scanned.content_hash {
-                    push_warning(
-                        warnings,
-                        self.limits.max_warnings,
-                        format!(
-                            "{} changed between traversal and parsing; indexed the revalidated bytes",
-                            scanned.relative_path.as_str()
-                        ),
-                    );
-                    progress.warning_count = progress.warning_count.saturating_add(1);
-                }
-                send_bounded(&source_tx, SourceTask { source }, &shared_cancel, || {
-                    self.store
-                        .job_status(job_id)
-                        .map(|job| job.cancel_requested)
-                })
-                .map_err(|error| match error {
-                    SendFailure::Cancelled => IndexingError::Cancelled,
-                    SendFailure::Disconnected => IndexingError::WorkerDisconnected,
-                    SendFailure::Store(message) => IndexingError::Store(message),
-                })?;
-                sent += 1;
-            }
-            self.check_cancelled(job_id, &shared_cancel)?;
-            drop(source_tx);
-
-            let mut persist_batch = Vec::with_capacity(self.limits.persist_batch_size);
-            for _ in 0..sent {
-                let result = loop {
-                    self.check_cancelled(job_id, &shared_cancel)?;
-                    match result_rx.recv_timeout(Duration::from_millis(10)) {
-                        Ok(result) => break result,
-                        Err(mpsc::RecvTimeoutError::Timeout) => continue,
-                        Err(mpsc::RecvTimeoutError::Disconnected) => {
-                            return Err(IndexingError::WorkerDisconnected);
+            // A chunk never exceeds either queue's capacity. Drain it before
+            // producing another, so bounded result backpressure cannot deadlock
+            // a producer waiting on the source queue. The inner closure owns both
+            // endpoints: on any failure they close before scoped workers join.
+            let processing_cancel = shared_cancel.clone();
+            let worker_handles = &handles;
+            let result = (move || -> Result<(), IndexingError> {
+                let shared_cancel = processing_cancel;
+                let mut persist_batch = Vec::with_capacity(self.limits.persist_batch_size);
+                for chunk in scanned_files.chunks(self.limits.source_queue_capacity) {
+                    let mut sent = 0_usize;
+                    for scanned in chunk {
+                        if shared_cancel.is_cancelled() {
+                            return Err(IndexingError::Cancelled);
                         }
-                    }
-                };
-                match result {
-                    Ok(file) => {
-                        progress.files_parsed = progress.files_parsed.saturating_add(1);
-                        let diagnostic_warnings = file
-                            .diagnostics
-                            .iter()
-                            .filter(|diagnostic| {
-                                matches!(diagnostic.severity.as_str(), "warning" | "error")
-                            })
-                            .count();
-                        progress.warning_count = progress
-                            .warning_count
-                            .saturating_add(u64::try_from(diagnostic_warnings).unwrap_or(u64::MAX));
-                        if file.parse_status == "failed" {
-                            progress.files_failed = progress.files_failed.saturating_add(1);
+                        if last_durable_cancel_check.elapsed() >= DURABLE_CANCELLATION_POLL_INTERVAL
+                        {
+                            self.check_cancelled(job_id, &shared_cancel)?;
+                            last_durable_cancel_check = Instant::now();
+                        }
+                        let fingerprints = self
+                            .extractor_factory
+                            .fingerprints(&scanned.relative_path)
+                            .map_err(|error| IndexingError::Extractor(error.message))?;
+                        let reusable = request.mode == IndexMode::Incremental
+                            && active
+                                .get(scanned.relative_path.as_str())
+                                .is_some_and(|prior| {
+                                    prior.content_hash == scanned.content_hash
+                                        && prior.grammar_fingerprint == fingerprints.grammar
+                                        && prior.query_fingerprint == fingerprints.query
+                                        && prior.extractor_fingerprint == fingerprints.extractor
+                                        && prior.config_fingerprint == request.config_fingerprint
+                                });
+                        if reusable {
+                            progress.files_reused = progress.files_reused.saturating_add(1);
+                            progress.files_persisted = progress.files_persisted.saturating_add(1);
+                            continue;
+                        }
+                        let source = self
+                            .reader
+                            .read(&scanned.relative_path)
+                            .map_err(|error| IndexingError::ScanIncomplete(error.to_string()))?;
+                        if source.content_hash() != scanned.content_hash {
                             push_warning(
                                 warnings,
                                 self.limits.max_warnings,
-                                format!("{}: parser coverage failed", file.relative_path),
+                                format!(
+                                    "{} changed between traversal and parsing; indexed the revalidated bytes",
+                                    scanned.relative_path.as_str()
+                                ),
                             );
-                        } else if file.parse_status == "partial" {
-                            push_warning(
-                                warnings,
-                                self.limits.max_warnings,
-                                format!("{}: parser coverage is partial", file.relative_path),
-                            );
+                            progress.warning_count = progress.warning_count.saturating_add(1);
                         }
-                        persist_batch.push(file);
-                        if persist_batch.len() >= self.limits.persist_batch_size {
-                            let count = u64::try_from(persist_batch.len()).unwrap_or(u64::MAX);
+                        send_bounded(&source_tx, SourceTask { source }, &shared_cancel, || {
                             self.store
-                                .stage_files(generation_id, std::mem::take(&mut persist_batch))
-                                .map_err(store_error)?;
-                            progress.files_persisted =
-                                progress.files_persisted.saturating_add(count);
+                                .job_status(job_id)
+                                .map(|job| job.cancel_requested)
+                        })
+                        .map_err(|error| match error {
+                            SendFailure::Cancelled => IndexingError::Cancelled,
+                            SendFailure::Disconnected => IndexingError::WorkerDisconnected,
+                            SendFailure::Store(message) => IndexingError::Store(message),
+                        })?;
+                        sent += 1;
+                    }
+                    self.check_cancelled(job_id, &shared_cancel)?;
+
+                    for _ in 0..sent {
+                        let result = loop {
+                            self.check_cancelled(job_id, &shared_cancel)?;
+                            match result_rx.recv_timeout(Duration::from_millis(10)) {
+                                Ok(result) => break result,
+                                Err(mpsc::RecvTimeoutError::Timeout) => {
+                                    if worker_handles
+                                        .iter()
+                                        .any(std::thread::ScopedJoinHandle::is_finished)
+                                    {
+                                        return Err(IndexingError::WorkerDisconnected);
+                                    }
+                                    continue;
+                                }
+                                Err(mpsc::RecvTimeoutError::Disconnected) => {
+                                    return Err(IndexingError::WorkerDisconnected);
+                                }
+                            }
+                        };
+                        match result {
+                            Ok(file) => {
+                                progress.files_parsed = progress.files_parsed.saturating_add(1);
+                                let diagnostic_warnings = file
+                                    .diagnostics
+                                    .iter()
+                                    .filter(|diagnostic| {
+                                        matches!(diagnostic.severity.as_str(), "warning" | "error")
+                                    })
+                                    .count();
+                                progress.warning_count = progress.warning_count.saturating_add(
+                                    u64::try_from(diagnostic_warnings).unwrap_or(u64::MAX),
+                                );
+                                if file.parse_status == "failed" {
+                                    progress.files_failed = progress.files_failed.saturating_add(1);
+                                    push_warning(
+                                        warnings,
+                                        self.limits.max_warnings,
+                                        format!("{}: parser coverage failed", file.relative_path),
+                                    );
+                                } else if file.parse_status == "partial" {
+                                    push_warning(
+                                        warnings,
+                                        self.limits.max_warnings,
+                                        format!(
+                                            "{}: parser coverage is partial",
+                                            file.relative_path
+                                        ),
+                                    );
+                                }
+                                persist_batch.push(file);
+                                if persist_batch.len() >= self.limits.persist_batch_size {
+                                    let count =
+                                        u64::try_from(persist_batch.len()).unwrap_or(u64::MAX);
+                                    self.store
+                                        .stage_files(
+                                            generation_id,
+                                            std::mem::take(&mut persist_batch),
+                                        )
+                                        .map_err(store_error)?;
+                                    progress.files_persisted =
+                                        progress.files_persisted.saturating_add(count);
+                                }
+                            }
+                            Err(error) if error.cancelled => {
+                                shared_cancel.cancel();
+                                return Err(IndexingError::Cancelled);
+                            }
+                            Err(error) => return Err(IndexingError::Extractor(error.message)),
                         }
+                        self.store
+                            .update_job(job_id, IndexJobState::Parsing, progress, None)
+                            .map_err(store_error)?;
                     }
-                    Err(error) if error.cancelled => {
-                        shared_cancel.cancel();
-                        return Err(IndexingError::Cancelled);
-                    }
-                    Err(error) => return Err(IndexingError::Extractor(error.message)),
                 }
-                self.store
-                    .update_job(job_id, IndexJobState::Parsing, progress, None)
-                    .map_err(store_error)?;
+                if !persist_batch.is_empty() {
+                    let count = u64::try_from(persist_batch.len()).unwrap_or(u64::MAX);
+                    self.store
+                        .stage_files(generation_id, persist_batch)
+                        .map_err(store_error)?;
+                    progress.files_persisted = progress.files_persisted.saturating_add(count);
+                }
+                drop(source_tx);
+                drop(result_rx);
+                Ok(())
+            })();
+            if result.is_err() {
+                shared_cancel.cancel();
             }
-            if !persist_batch.is_empty() {
-                let count = u64::try_from(persist_batch.len()).unwrap_or(u64::MAX);
-                self.store
-                    .stage_files(generation_id, persist_batch)
-                    .map_err(store_error)?;
-                progress.files_persisted = progress.files_persisted.saturating_add(count);
-            }
+            // Join every handle even after a panic; leaving a panicked scoped
+            // handle unjoined would re-panic from thread::scope itself.
+            let mut panicked = false;
             for handle in handles {
-                handle.join().map_err(|_| IndexingError::WorkerPanicked)?;
+                panicked |= handle.join().is_err();
             }
-            Ok(())
+            if panicked {
+                Err(IndexingError::WorkerPanicked)
+            } else {
+                result
+            }
         })
     }
 

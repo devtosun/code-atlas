@@ -9,7 +9,7 @@ contain names, signatures, snippets and explicit memory text.
 
 ## Logical tables
 
-Phase 14 ships and tests schema version 6. It retains the Phase 08 indexing model
+Review repairs ship and test schema version 7. It retains the Phase 08 indexing model
 and adds generation resolver version/count metadata, `external_nodes`,
 `resolved_edges` and `resolution_diagnostics`. A unique generation/file-version
 membership key supports composite foreign keys that prevent graph rows from naming
@@ -19,6 +19,17 @@ Schema v6 adds `generation_files(file_version_id)` for bounded orphan-version
 cleanup and `symbols(lower(spelling))` for folded exact/prefix retrieval. These are
 derived access paths only; generation identity, immutable rows and activation
 semantics are unchanged.
+
+Schema v7 makes file-version identity `(file_id, content_hash, analysis_key)`.
+`analysis_key` is a versioned length-framed encoding of language/dialect, grammar,
+query, extractor and configuration fingerprints; separators cannot alias keys.
+The v6 unique-key column is renamed in a transaction, not rebuilt or dropped.
+Legacy extractor fingerprints are preserved in the new `extractor_hash` column,
+their analysis keys are namespaced `legacy-v6:`, and their per-version `config_hash`
+is empty to force revalidation. IDs, FKs, facts, FTS rows and notes survive.
+Reusing a complete identity links membership only; it never appends facts.
+The v7 `(file_version_id, spelling)` symbol index bounds same-name FTS joins to the
+selected file version. Higher-tier direct matches are excluded before FTS scoring.
 
 The full logical model is:
 - `meta`: schema version, active generation ID, root identity, limits fingerprint.
@@ -132,7 +143,13 @@ explicit failure/coverage record. Activation policy for per-file parse errors is
 If a job is cancelled or crashes before activation, abandon its generation. After
 restart mark the old owner's queued/running jobs interrupted. Do not silently resume
 a risky operation or report it successful. GC removes abandoned/unreferenced versions
-without touching active data or persistent notes.
+without touching active data or persistent notes. Completed history is bounded to
+the active generation and its immediate predecessor, plus an in-progress candidate.
+GC detaches expired parent links and removes superseded generations and orphan
+versions/FTS rows. Existing WAL read transactions stay pinned; public cursors still
+require the active generation and return `STALE_CURSOR` after activation. This is
+a generation-count retention policy, not a byte/disk quota or a timed cursor lease.
+Long-lived pinned readers can retain WAL pages; notes are never evicted by this GC.
 
 Memory writes run on the same bounded writer actor and use `synchronous=FULL`.
 Creating a note requires a fresh ID; updating or deleting an existing note requires

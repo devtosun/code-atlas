@@ -883,13 +883,7 @@ impl FileScanner {
                 Err(RepositoryError::Io { source, .. })
                     if source.kind() == io::ErrorKind::NotFound => {}
                 Err(error) => {
-                    if !matches!(
-                        &error,
-                        RepositoryError::FileTooLarge { .. }
-                            | RepositoryError::BinaryFile { .. }
-                            | RepositoryError::InvalidUtf8 { .. }
-                            | RepositoryError::LinkNotAllowed { .. }
-                    ) {
+                    if !matches!(&error, RepositoryError::LinkNotAllowed { .. }) {
                         result.complete = false;
                     }
                     result
@@ -1058,13 +1052,7 @@ impl FileScanner {
                     }),
                     Err(RepositoryError::Excluded { .. }) => {}
                     Err(error) => {
-                        if !matches!(
-                            &error,
-                            RepositoryError::FileTooLarge { .. }
-                                | RepositoryError::BinaryFile { .. }
-                                | RepositoryError::InvalidUtf8 { .. }
-                                | RepositoryError::LinkNotAllowed { .. }
-                        ) {
+                        if !matches!(&error, RepositoryError::LinkNotAllowed { .. }) {
                             result.complete = false;
                         }
                         result
@@ -1142,6 +1130,35 @@ mod tests {
 
     fn write(path: impl AsRef<Path>, contents: &[u8]) {
         fs::write(path, contents).expect("write test file");
+    }
+
+    #[test]
+    fn rejected_source_is_incomplete_in_full_and_targeted_scans() {
+        let root = TestDir::new("invalid-not-deleted");
+        let relative = RelativeSourcePath::new("a.rs").expect("relative path");
+        let scanner = FileScanner::new(SourceReader::new(
+            repository(root.path()),
+            ScanPolicy::new(32, 100, 100, Vec::<String>::new()).expect("policy"),
+        ));
+        for bytes in [vec![0xff], vec![0], vec![b'a'; 33]] {
+            write(root.path().join("a.rs"), &bytes);
+            assert!(!scanner.scan().complete);
+            assert!(
+                !scanner
+                    .scan_paths(
+                        std::slice::from_ref(&relative),
+                        &CancellationContext::default()
+                    )
+                    .complete
+            );
+        }
+        fs::remove_file(root.path().join("a.rs")).expect("real deletion");
+        assert!(scanner.scan().complete);
+        assert!(
+            scanner
+                .scan_paths(&[relative], &CancellationContext::default())
+                .complete
+        );
     }
 
     #[test]
@@ -1251,7 +1268,7 @@ mod tests {
         write(root.path().join("large.rs"), b"12345678901234567");
         let policy = ScanPolicy::new(16, 100, 100, Vec::<String>::new()).expect("valid policy");
         let result = FileScanner::new(SourceReader::new(repository(root.path()), policy)).scan();
-        assert!(result.complete);
+        assert!(!result.complete);
         assert!(result.files.iter().all(|file| {
             !matches!(
                 file.relative_path.as_str(),

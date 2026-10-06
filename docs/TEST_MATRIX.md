@@ -1,11 +1,42 @@
-# Test matrix — implementation evidence through Phase 14
+# Test matrix — implementation evidence through Phase 15
+
+## Review repairs — 2026-10-06
+
+Current-source native macOS ARM64 gates: fmt, locked/offline all-target check,
+Clippy with warnings denied, workspace tests (130 passed, two child-process helpers
+ignored in the top-level harness but executed by parent tests), and all seven
+existing xtask grammar/fixture/corpus gates pass. This is repair validation, not a
+new phase. Exact commands, source provenance and limitations are in
+`docs/reports/review-fixes.md`; older phase sections below are historical evidence.
+
+| Boundary | Fresh regression evidence |
+|---|---|
+| Scope / binding | LF-less equal ranges terminate; cancellation guard; member versus bare-name negatives in five languages; Go directory isolation; Rust local import and nested alias shadowing |
+| Extraction | Dart import/export show/hide intersection/subtraction; arrow/function-expression exports and local/default aliases in all four ECMAScript dialects; reviewed golden changes |
+| Storage | schema v6→v7 preserves IDs, facts and notes; forced migration rolls back; grammar/query/extractor/config changes create immutable versions; cache hits never append facts |
+| Indexing | invalid UTF-8, binary and oversized source preserve healthy active generation in full/targeted paths; real deletion succeeds; result high-water ≤ queue + batch; worker factory/panic/storage failures do not activate |
+| Retention | 100 unit-test activations and 30 CLI changed/no-change generations retain active + predecessor, preserve notes/FKs and pinned WAL reads; public cursors remain generation-bound |
+| Search | SQL keysets across five ranking tiers plus qualified tier; deduplicated same-name FTS documents; 11,000 distinct results across 275 pages, honest terminal state |
+| Protocol / config | both MCP eras enforce prompt, escaped ID and complete frame limits; >1 MiB ingress closes without echo; malformed TOML canary never appears in diagnostics and all four config modes preserve bytes |
+| Package | two deterministic native archives have the same digest; extracted package passes seven-language index, dual-era discovery, writer/follower, corrupt-startup, EOF and disposable config round-trip |
+
+Fresh binary SHA-256:
+`5148b860de01c893ec7a1afcfee515c0ade475f1a60d8d1045ea90f3316a77fe`.
+Fresh archive SHA-256:
+`56e0b3d1d31a709c10f60384e27f9c5306ceeff9a90299315b36a219c9482103`.
+The 1,000-file sanity run measures modern/legacy startup p95 33.251/45.126 ms,
+warm exact lookup p95 19.014 ms, full index 4.105 s and sampled peak RSS 32,587,776
+bytes. This does not requalify the old 10k/100k or 10k-watcher performance gates.
+Fresh fuzz, cargo-audit/cargo-deny, installed-Codex parsing, model-backed sessions,
+Linux and Windows were not run; none are counted as fresh passes. See
+`docs/reports/artifacts/review-fixes-*.json` for raw generated-corpus evidence.
 
 ## Layers
 | Gate | What must be established | Initial state |
 |---|---|---|
 | Compatibility | all grammars load/parse/query with one runtime; modern/legacy MCP; patched SQLite/FTS5 | PASS on macOS arm64 — Phase 00 report |
 | Core | path/range/ID invariants; deterministic normalization; bounded limits | PHASE 02 PASS on macOS arm64 — canonical roots, normalized relative paths, Windows-form rejection, prefix containment, source bounds and prior typed invariants |
-| Storage | migrations, FTS sync, generation isolation, notes preservation, owner/follower | PHASE 14 PASS on macOS arm64 — SQLite 3.53.2/FTS5/WAL, schema v1→v6, rollback on forced migration failure, indexed 100k cleanup, generated join isolation, killed-writer note preservation and prior graph/lock gates |
+| Storage | migrations, FTS sync, generation isolation, notes preservation, owner/follower | REVIEW REPAIR PASS on macOS arm64 — SQLite 3.53.2/FTS5/WAL, schema v1→v7, complete immutable analysis identity, rollback, bounded generation retention and preserved prior graph/lock gates; historical Phase 14 100k evidence is not rerun |
 | Languages | seven languages + JSX/TSX positive/negative/partial fixtures | PHASE 07 LANGUAGE PASS on macOS arm64 — all nine providers parse and extract; 24 parser fixtures plus 8 Rust/Go, 11 JS/TS, 11 C#/Java and 8 Dart focused cases have reviewed category hashes |
 | Indexing | full vs incremental equivalence, delete/rename/edit, failed traversal | PHASE 12 PASS on macOS arm64 — prior indexing gates plus watched all-language atomic save, rename/delete/recreate, case/Unicode path, ignore, burst and Git HEAD sequences converging with a clean full rebuild |
 | Resolution | shadowing, overload candidates, aliases, cycles, external/dynamic cases | PHASE 09 PASS on macOS arm64 — 35 independently labelled sites, lexical/import rules, aliases/re-exports, external nodes, candidate/unresolved preservation and incremental/full equivalence |
@@ -13,7 +44,7 @@
 | Protocol | both lifecycle eras, tools/resources/prompts, cancellation, EOF | PHASE 13 PASS WITH LIMITATION — modern/legacy full-binary tests cover all sixteen opted-in tools, default-hidden writes, four resource forms, three prompts, version-correct results and prior EOF/cap gates; actual Codex UI exposure was not run |
 | Security | escapes, secret excludes, injection-as-data, invalid requests, resource caps | PHASE 14 PASS on supported macOS ARM64 — generated boundaries, dual-era adversarial tools/resources and three bounded fuzz targets pass; native-code/TOCTOU residuals remain documented |
 | Reliability | locked/corrupt/read-only DB, disk errors, killed writer, watcher overflow | PHASE 14 PASS on supported macOS ARM64 — killed writer preserves active data and notes, migration rollback, generation isolation, cancellation and watcher recovery pass; physical power loss remains untested |
-| Release | clean-machine native launch, packaged grammars, preserved Codex config | PHASE 14 macOS ARM64 PASS — stripped release is measured and supply-chain/accuracy gates pass; Phase 15 packaging/Codex integration remains pending; Linux/Windows are deferred and unsupported |
+| Release | clean-machine native launch, packaged grammars, preserved Codex config | PHASE 15 macOS ARM64 PASS — deterministic archive and extracted-package dual-era/index/follower/corrupt-startup/EOF/config tests pass; installed Codex parses a disposable entry; model-backed session not run; Linux/Windows deferred |
 
 ## Precision measurement
 Keep a hand-labelled fixture corpus with declarations, reference sites, candidate
@@ -309,6 +340,31 @@ Cargo-audit scans 294 locked dependencies against 1,251 advisories with no findi
 cargo-deny passes advisories, bans, licenses and sources. Three isolated five-minute
 fuzz targets build and complete with zero crashes/timeouts. These bounded runs are
 not a proof of native grammar memory safety. See the dependency and fuzz artifacts.
+
+Phase 15 native package/integration status:
+
+| Platform | Native package / extracted MCP / Codex config | Evidence |
+|---|---|---|
+| macOS 27.0 arm64 | PASS WITH CLIENT LIMITATION | `docs/reports/15-release-and-codex.md`; deterministic archive, 7-language index, both protocol eras, follower/corrupt-startup/EOF and safe config round-trip pass |
+| Linux x64 | NOT RUN / UNSUPPORTED | deferred to `prompts/14-linux-windows-native-validation.md`; no package produced |
+| Windows x64 MSVC | NOT RUN / UNSUPPORTED | deferred; native replacement, ACL, junction and package behavior unexecuted |
+
+The extracted unsigned archive runs from a Unicode/space path under an empty `PATH`;
+no Rust, Dart, Node, Go, Java or .NET SDK is visible. It indexes seven generated
+language fixtures with zero failures and serves 14 default tools over modern
+2026-07-28 and legacy 2025-11-25 MCP. A concurrent follower remains queryable, corrupt
+storage does not block discovery/tools-list, and EOF exits cleanly. `toml_edit` unit
+and package tests preserve unrelated comments/settings/MCP entries, reject malformed
+TOML and unowned name collisions, set `required=false`, back up apply, and remove only
+the marked entry while source/notes sentinels survive.
+
+The native binary SHA-256 is
+`45f11cecbadafc64456fd06ea36dcca9e140737d808f42ac56878afee6227b82`;
+the 5,484,074-byte archive SHA-256 is
+`57e64086ba5fb066f0fd79f1a2aeda71080e7cb68e8a7c8a7ca023327485c427`.
+Repackaging the same binary produces the same archive digest. Installed
+`codex-cli 0.154.0` parses the entry in a disposable `CODEX_HOME`; no model-backed
+session ran because fixture-source transmission was not explicitly authorized.
 
 ## Evidence reports
 Each report includes git revision (or explicitly dirty state), toolchain, target,

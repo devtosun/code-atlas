@@ -1,0 +1,32 @@
+name: Native package — macOS ARM64
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: macos-15
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Confirm native supported runner
+        run: test "$(uname -s)-$(uname -m)" = "Darwin-arm64"
+      - name: Install pinned Rust toolchain
+        run: rustup toolchain install 1.98.1 --profile minimal --component clippy,rustfmt
+      - name: Verify workspace
+        run: cargo run -p xtask --locked -- verify
+      - name: Build deterministic package
+        run: python3 scripts/package_macos.py
+      - name: Test extracted package
+        run: python3 scripts/phase15_package_smoke.py dist/codeatlas-0.1.0-aarch64-apple-darwin.tar.gz
+      - name: Upload unsigned package and checksum
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: codeatlas-0.1.0-aarch64-apple-darwin-unsigned
+          path: |
+            dist/codeatlas-0.1.0-aarch64-apple-darwin.tar.gz
+            dist/codeatlas-0.1.0-aarch64-apple-darwin.tar.gz.sha256
+          if-no-files-found: error

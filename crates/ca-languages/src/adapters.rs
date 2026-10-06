@@ -292,6 +292,7 @@ fn extract_source_language<A: SourceAdapter>(
         reference.scope_id = containing_scope_id(range, &output.scopes, None);
         reference.resolution = ResolutionCategory::SyntaxObservation;
         adapter.decorate_reference(kind, capture.node, source, &mut reference)?;
+        decorate_member_selector(capture.node, source, &mut reference)?;
         output.references.push(reference);
     }
 
@@ -399,12 +400,19 @@ fn containing_scope_id(
         .iter()
         .filter(|scope| excluded_id != Some(scope.id.as_str()))
         .filter(|scope| scope.syntax_range.contains(range))
+        .filter(|scope| {
+            excluded_id.is_none() || scope.syntax_range != range || scope.kind == "file"
+        })
         .min_by_key(|scope| {
-            scope
-                .syntax_range
-                .bytes
-                .end()
-                .saturating_sub(scope.syntax_range.bytes.start())
+            (
+                scope
+                    .syntax_range
+                    .bytes
+                    .end()
+                    .saturating_sub(scope.syntax_range.bytes.start()),
+                scope.kind == "file",
+                scope.id.as_str(),
+            )
         })
         .map(|scope| scope.id.clone())
 }
@@ -414,6 +422,36 @@ fn text<'source>(node: Node<'_>, source: &'source [u8]) -> Result<&'source str, 
         .map_err(|error| LanguageError::InvalidUtf8 {
             valid_up_to: error.valid_up_to(),
         })
+}
+
+// Selectors are not bare lexical names. These fields come from the pinned grammars.
+fn decorate_member_selector(
+    node: Node<'_>,
+    source: &[u8],
+    observation: &mut SyntaxObservation,
+) -> Result<(), LanguageError> {
+    let Some(parent) = node.parent() else {
+        return Ok(());
+    };
+    let (selector, receiver) = match parent.kind() {
+        "field_expression" => ("field", "value"),
+        "selector_expression" => ("field", "operand"),
+        "member_access_expression" => ("name", "expression"),
+        "field_access" => ("field", "object"),
+        "member_expression" | "null_aware_member_expression" => ("property", "object"),
+        _ => return Ok(()),
+    };
+    if parent.child_by_field_name(selector) == Some(node) {
+        observation.receiver_type = parent
+            .child_by_field_name(receiver)
+            .map(|receiver| text(receiver, source).map(str::to_owned))
+            .transpose()?;
+        observation.attributes.push("member_selector".to_owned());
+        observation
+            .limitations
+            .push("receiver_type_not_inferred".to_owned());
+    }
+    Ok(())
 }
 
 fn signature_before_body(node: Node<'_>, source: &[u8]) -> Result<String, LanguageError> {
@@ -899,6 +937,21 @@ impl SourceAdapter for DartAdapter {
                 .child_by_field_name("alias")
                 .map(|alias| text(alias, source).map(str::to_owned))
                 .transpose()?;
+        }
+        for combinator in named_descendants(node, &["combinator"]) {
+            let mut cursor = combinator.walk();
+            let names = combinator
+                .named_children(&mut cursor)
+                .filter(|child| child.kind() == "identifier")
+                .map(|child| text(child, source))
+                .collect::<Result<Vec<_>, _>>()?
+                .join(",");
+            let kind = if text(combinator, source)?.trim_start().starts_with("show") {
+                "show"
+            } else {
+                "hide"
+            };
+            observation.attributes.push(format!("{kind}:{names}"));
         }
         if spelling.starts_with("package:") {
             observation
@@ -2664,10 +2717,16 @@ impl EcmaAdapter {
                 .attributes
                 .push(format!("decorator:{}", text(decorator, source)?.trim()));
         }
-        if syntax_node
-            .parent()
-            .is_some_and(|parent| parent.kind() == "export_statement")
-        {
+        let mut export_parent = syntax_node.parent();
+        while export_parent.is_some_and(|parent| {
+            matches!(
+                parent.kind(),
+                "lexical_declaration" | "variable_declaration"
+            )
+        }) {
+            export_parent = export_parent.and_then(|parent| parent.parent());
+        }
+        if export_parent.is_some_and(|parent| parent.kind() == "export_statement") {
             observation.attributes.push("exported".to_owned());
         }
         match kind {

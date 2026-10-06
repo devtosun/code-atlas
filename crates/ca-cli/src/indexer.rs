@@ -714,7 +714,7 @@ mod tests {
         path::{Path, PathBuf},
         sync::{
             Arc,
-            atomic::{AtomicBool, Ordering},
+            atomic::{AtomicBool, AtomicUsize, Ordering},
         },
         thread,
         time::{Duration, Instant, SystemTime, UNIX_EPOCH},
@@ -795,6 +795,75 @@ mod tests {
     struct SlowFactory {
         started: Arc<AtomicBool>,
         observed_cancel: Arc<AtomicBool>,
+    }
+
+    struct ObservedFactory<'a> {
+        storage: &'a Storage,
+        produced: Arc<AtomicUsize>,
+        peak: Arc<AtomicUsize>,
+        panic: bool,
+        fail_create: bool,
+    }
+
+    struct ObservedWorker<'a> {
+        factory: ObservedFactory<'a>,
+        inner: LanguageExtractionWorker,
+    }
+
+    impl<'a> ExtractionWorkerFactory for ObservedFactory<'a> {
+        type Worker = ObservedWorker<'a>;
+        fn create(&self) -> Result<Self::Worker, ExtractionFailure> {
+            if self.fail_create {
+                return Err(ExtractionFailure {
+                    cancelled: false,
+                    message: "injected worker factory failure".into(),
+                });
+            }
+            Ok(ObservedWorker {
+                factory: Self {
+                    storage: self.storage,
+                    produced: Arc::clone(&self.produced),
+                    peak: Arc::clone(&self.peak),
+                    panic: self.panic,
+                    fail_create: self.fail_create,
+                },
+                inner: ParserFactory.create()?,
+            })
+        }
+        fn fingerprints(
+            &self,
+            path: &ca_engine::repository::RelativeSourcePath,
+        ) -> Result<ExtractionFingerprints, ExtractionFailure> {
+            ParserFactory.fingerprints(path)
+        }
+        fn extractor_set_fingerprint(&self) -> String {
+            ParserFactory.extractor_set_fingerprint()
+        }
+    }
+
+    impl ExtractionWorker for ObservedWorker<'_> {
+        fn extract(
+            &mut self,
+            source: &SourceFile,
+            cancellation: &CancellationContext,
+        ) -> Result<IndexedFile, ExtractionFailure> {
+            assert!(!self.factory.panic, "injected test worker panic");
+            let file = self.inner.extract(source, cancellation)?;
+            let parsed = self.factory.produced.fetch_add(1, Ordering::SeqCst) + 1;
+            let persisted = self
+                .factory
+                .storage
+                .index_summary()
+                .expect("observed progress")
+                .latest_job
+                .expect("job")
+                .progress
+                .files_persisted as usize;
+            self.factory
+                .peak
+                .fetch_max(parsed.saturating_sub(persisted), Ordering::SeqCst);
+            Ok(file)
+        }
     }
 
     struct SlowWorker {
@@ -918,6 +987,166 @@ mod tests {
                 &CancellationContext::default(),
             )
             .expect("run targeted index")
+    }
+
+    #[test]
+    fn bounded_results_and_worker_panics_preserve_active_data() {
+        let base = std::env::temp_dir().join(format!(
+            "codeatlas-bounded-results-{}-{}",
+            std::process::id(),
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .expect("clock")
+                .as_nanos()
+        ));
+        let root = base.join("repo");
+        let data = base.join("data");
+        fs::create_dir_all(&root).expect("root");
+        fs::create_dir_all(&data).expect("data");
+        fs::write(root.join("healthy.rs"), "pub fn healthy(){}\n").expect("source");
+        let (identity, storage) = open_test_storage(&root, &data);
+        run_real_index(identity.clone(), &storage, IndexMode::Full);
+        let original = storage
+            .read_snapshot()
+            .expect("original")
+            .generation_id()
+            .clone();
+        for index in 0..64 {
+            fs::write(
+                root.join(format!("f{index}.rs")),
+                format!("pub fn f{index}(){{}}\n"),
+            )
+            .expect("source");
+        }
+        let adapter = StorageIndexAdapter::new(&storage);
+        for (panic, fail_create) in [(false, true), (true, false), (false, false)] {
+            let peak = Arc::new(AtomicUsize::new(0));
+            let factory = ObservedFactory {
+                storage: &storage,
+                produced: Arc::new(AtomicUsize::new(0)),
+                peak: Arc::clone(&peak),
+                panic,
+                fail_create,
+            };
+            let service = IndexService::new(
+                SourceReader::new(identity.clone(), ScanPolicy::default()),
+                &adapter,
+                &factory,
+                IndexLimits {
+                    worker_count: 2,
+                    source_queue_capacity: 2,
+                    persist_batch_size: 3,
+                    max_warnings: 16,
+                },
+            )
+            .expect("service");
+            let result = service.run(
+                IndexRequest {
+                    mode: IndexMode::Full,
+                    request_key: None,
+                    config_fingerprint: DEFAULT_CONFIG_FINGERPRINT.into(),
+                    changed_paths: None,
+                },
+                &CancellationContext::default(),
+            );
+            if panic || fail_create {
+                if panic {
+                    assert!(matches!(result, Err(IndexingError::WorkerPanicked)));
+                } else {
+                    assert!(matches!(result, Err(IndexingError::Extractor(_))));
+                    assert_eq!(factory.produced.load(Ordering::SeqCst), 0);
+                }
+                assert_eq!(
+                    storage
+                        .read_snapshot()
+                        .expect("healthy still active")
+                        .generation_id(),
+                    &original
+                );
+            } else {
+                assert_eq!(
+                    result.expect("bounded pipeline").job.progress.files_parsed,
+                    65
+                );
+                assert!(
+                    peak.load(Ordering::SeqCst) <= 5,
+                    "parsed-but-unpersisted high-water must be queue + batch bounded"
+                );
+            }
+        }
+        drop(storage);
+        fs::remove_dir_all(base).expect("cleanup");
+    }
+
+    #[test]
+    fn targeted_rejected_source_never_activates_a_deletion() {
+        let base = std::env::temp_dir().join(format!(
+            "codeatlas-targeted-invalid-{}-{}",
+            std::process::id(),
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .expect("clock")
+                .as_nanos()
+        ));
+        let root = base.join("repo");
+        let data = base.join("data");
+        fs::create_dir_all(&root).expect("root");
+        fs::create_dir_all(&data).expect("data");
+        fs::write(root.join("a.rs"), "pub fn healthy(){}\n").expect("healthy");
+        let (identity, storage) = open_test_storage(&root, &data);
+        run_real_index(identity.clone(), &storage, IndexMode::Full);
+        let original = storage
+            .read_snapshot()
+            .expect("original")
+            .generation_id()
+            .clone();
+        let adapter = StorageIndexAdapter::new(&storage);
+        let factory = ParserFactory;
+        let service = IndexService::new(
+            SourceReader::new(identity.clone(), ScanPolicy::default()),
+            &adapter,
+            &factory,
+            IndexLimits::default(),
+        )
+        .expect("service");
+        for bytes in [vec![0xff], vec![0], vec![b'a'; 2 * 1024 * 1024 + 1]] {
+            fs::write(root.join("a.rs"), bytes).expect("invalid source");
+            let result = service.run(
+                IndexRequest {
+                    mode: IndexMode::Incremental,
+                    request_key: None,
+                    config_fingerprint: DEFAULT_CONFIG_FINGERPRINT.into(),
+                    changed_paths: Some(vec![
+                        ca_engine::repository::RelativeSourcePath::new("a.rs").expect("path"),
+                    ]),
+                },
+                &CancellationContext::default(),
+            );
+            assert!(matches!(result, Err(IndexingError::ScanIncomplete(_))));
+            assert_eq!(
+                storage
+                    .read_snapshot()
+                    .expect("healthy active")
+                    .generation_id(),
+                &original
+            );
+        }
+        fs::remove_file(root.join("a.rs")).expect("real deletion");
+        run_targeted_index(
+            identity,
+            &storage,
+            vec![ca_engine::repository::RelativeSourcePath::new("a.rs").expect("path")],
+        );
+        assert!(
+            storage
+                .read_snapshot()
+                .expect("empty active")
+                .facts()
+                .expect("facts")
+                .is_empty()
+        );
+        drop(storage);
+        fs::remove_dir_all(base).expect("cleanup");
     }
 
     #[test]
